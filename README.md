@@ -13,6 +13,9 @@ My Global Game Jam 2024 repository
 
 * [Project board](https://github.com/users/Slideshow776/projects/6/views/1)
 
+todo: make a not about this: "git update-index --chmod=+x gradlew"
+
+
 ## Credits: 
 * Game designer and coder: Sandra Moen
 

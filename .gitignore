@@ -1,3 +1,11 @@
+## Steam
+/Steam/
+/steam_api/
+
+## LibGDX
+/packr build files/
+/assets/images/included/packed/
+
 ## Gradle:
 .gradle/
 gradle-app.setting
