@@ -11,7 +11,7 @@ My Global Game Jam 2024 repository
 
 [Description of game here]
 
-* [Project board]()
+* [Project board](https://github.com/users/Slideshow776/projects/6/views/1)
 
 ## Credits: 
 * Game designer and coder: Sandra Moen
