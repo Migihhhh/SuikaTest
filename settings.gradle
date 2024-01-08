@@ -1,1 +1,1 @@
-include 'desktop', 'android', 'html', 'core'
+include 'html', 'lwjgl3', 'android', 'core'

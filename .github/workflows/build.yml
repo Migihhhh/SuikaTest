@@ -10,7 +10,7 @@ on:
 jobs:
   build:
     env:
-      ITCH_PROJECT: 'sandramoen/a-terrifying-knight'
+      ITCH_PROJECT: 'sandramoen/ggj2024'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
