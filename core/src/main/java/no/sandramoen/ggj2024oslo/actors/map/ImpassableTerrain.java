@@ -3,7 +3,7 @@ package no.sandramoen.ggj2024oslo.actors.map;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
-import no.sandramoen.ggj2024oslo.actors.utils.BaseActor;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 
 public class ImpassableTerrain extends BaseActor {
     public ImpassableTerrain(float x, float y, float width, float height, Stage stage) {

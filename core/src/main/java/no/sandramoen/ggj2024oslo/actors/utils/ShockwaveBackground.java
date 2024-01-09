@@ -8,6 +8,8 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
 
@@ -24,7 +26,7 @@ public class ShockwaveBackground extends BaseActor {
 
         loadTexture(texturePath);
         setSize(Gdx.graphics.getWidth(), Gdx.graphics.getHeight());
-        shaderProgram = GameUtils.initShaderProgram(BaseGame.defaultShader, BaseGame.shockwaveShader);
+        shaderProgram = GameUtils.initShaderProgram(AssetLoader.defaultShader, AssetLoader.shockwaveShader);
 
         addListener(
                 (Event event) -> {

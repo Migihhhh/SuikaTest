@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
 import no.sandramoen.ggj2024oslo.ui.MadeByLabel;
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
@@ -20,7 +21,7 @@ public class MenuScreen extends BaseScreen {
 
     @Override
     public void initialize() {
-        Image featureGraphics = new Image(BaseGame.textureAtlas.findRegion("GUI/feature graphics"));
+        Image featureGraphics = new Image(AssetLoader.textureAtlas.findRegion("GUI/feature graphics"));
         featureGraphics.setOrigin(Align.center);
         featureGraphics.addAction(Actions.sequence(Actions.fadeOut(0), Actions.fadeIn(.5f)));
         uiTable.add(featureGraphics)
@@ -86,7 +87,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     private TextButton resumeButton() {
-        TextButton button = new TextButton("Resume", BaseGame.mySkin);
+        TextButton button = new TextButton("Resume", AssetLoader.mySkin);
         button.setColor(Color.BLUE);
         button.addListener(
                 (Event event) -> {
@@ -99,7 +100,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     private TextButton startButton() {
-        TextButton button = new TextButton("Start", BaseGame.mySkin);
+        TextButton button = new TextButton("Start", AssetLoader.mySkin);
         button.addListener(
                 (Event event) -> {
                     if (GameUtils.isTouchDownEvent(event))
@@ -111,7 +112,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     private TextButton optionsButton() {
-        TextButton button = new TextButton("Options", BaseGame.mySkin);
+        TextButton button = new TextButton("Options", AssetLoader.mySkin);
         button.addListener(
                 (Event event) -> {
                     if (GameUtils.isTouchDownEvent(event))
@@ -123,7 +124,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     private TextButton exitButton() {
-        TextButton button = new TextButton("Exit", BaseGame.mySkin);
+        TextButton button = new TextButton("Exit", AssetLoader.mySkin);
         button.addListener(
                 (Event event) -> {
                     if (GameUtils.isTouchDownEvent(event) && !button.hasActions())

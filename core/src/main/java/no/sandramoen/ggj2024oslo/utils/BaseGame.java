@@ -7,14 +7,6 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
-import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
-import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
-import com.badlogic.gdx.graphics.g2d.TextureAtlas;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.maps.tiled.TmxMapLoader;
-import com.badlogic.gdx.scenes.scene2d.ui.Skin;
-import com.badlogic.gdx.utils.Array;
 
 import no.sandramoen.ggj2024oslo.screens.gameplay.LevelScreen;
 
@@ -24,23 +16,7 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     public static AssetManager assetManager;
 
     // game assets
-    public static TextureAtlas textureAtlas;
-    public static Skin mySkin;
     public static LevelScreen levelScreen;
-
-    public static String defaultShader;
-    public static String shockwaveShader;
-
-    public static Array<TiledMap> maps;
-    public static TiledMap testMap;
-    public static TiledMap level1;
-    public static TiledMap level2;
-    public static TiledMap currentLevel;
-
-    public static Sound click1Sound;
-    public static Sound hoverOverEnterSound;
-
-    public static Music menuMusic;
 
     // game state
     public static Preferences preferences;
@@ -59,13 +35,7 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     public void create() {
         Gdx.input.setInputProcessor(new InputMultiplexer());
         loadGameState();
-        UI();
-        assetManager();
-
-        maps = new Array();
-        maps.add(testMap);
-        maps.add(level1);
-        maps.add(level2);
+        new AssetLoader();
     }
 
     public static void setActiveScreen(BaseScreen screen) {
@@ -95,7 +65,7 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
         }
     }
 
-    private void UI() {
+    /*private void UI() {
         mySkin = new Skin(Gdx.files.internal("skins/mySkin/mySkin.json"));
         float scale = Gdx.graphics.getWidth() * .000656f; // magic number ensures scale ~= 1, based on screen width
         scale *= 1.01f; // make x percent bigger, bigger = more fuzzy
@@ -103,9 +73,9 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
         mySkin.getFont("Play-Bold20white").getData().setScale(scale);
         mySkin.getFont("Play-Bold40white").getData().setScale(scale);
         mySkin.getFont("Play-Bold59white").getData().setScale(scale);
-    }
+    }*/
 
-    private void assetManager() {
+    /*private void assetManager() {
         long startTime = System.currentTimeMillis();
         assetManager = new AssetManager();
         assetManager.setErrorListener(this);
@@ -149,5 +119,5 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
 
         textureAtlas = assetManager.get("images/included/packed/images.pack.atlas");
         GameUtils.printLoadingTime(getClass().getSimpleName(), "Assetmanager", startTime);
-    }
+    }*/
 }

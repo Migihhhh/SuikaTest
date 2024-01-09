@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.ParticleEffect;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Group;
 
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class ParticleActor extends Group {
@@ -27,7 +28,7 @@ public class ParticleActor extends Group {
     public ParticleActor(String pfxFile) {
         super();
         effect = new ParticleEffect();
-        effect.load(Gdx.files.internal(pfxFile), BaseGame.textureAtlas);
+        effect.load(Gdx.files.internal(pfxFile), AssetLoader.textureAtlas);
         renderingActor = new ParticleRenderer(effect);
         this.addActor(renderingActor);
     }

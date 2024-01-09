@@ -5,7 +5,8 @@ import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 
-import no.sandramoen.ggj2024oslo.actors.utils.BaseActor;
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class Background extends BaseActor {
@@ -13,7 +14,7 @@ public class Background extends BaseActor {
 
     public Background(float x, float y, Stage stage) {
         super(x, y, stage);
-        animationImages.add(BaseGame.textureAtlas.findRegion("grass"));
+        animationImages.add(AssetLoader.textureAtlas.findRegion("grass"));
         animation = new Animation(2f, animationImages, Animation.PlayMode.LOOP);
         setAnimation(animation);/*
         setSize(TiledMapActor.mapWidth, TiledMapActor.mapHeight);*/

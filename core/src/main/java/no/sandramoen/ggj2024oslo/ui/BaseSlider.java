@@ -13,6 +13,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.github.tommyettinger.textra.TypingLabel;
 
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
 
@@ -21,7 +22,7 @@ public class BaseSlider extends Table {
     private Slider slider;
 
     public BaseSlider(String labelText, float min, float max, float stepSize) {
-        label = new TypingLabel(labelText, new Label.LabelStyle(BaseGame.mySkin.get("Play-Bold20white", BitmapFont.class), null));
+        label = new TypingLabel(labelText, new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold20white", BitmapFont.class), null));
         GameUtils.setWidgetHoverColor(label);
         add(label).growX().left().padRight(Gdx.graphics.getWidth() * .05f);
 
@@ -34,7 +35,7 @@ public class BaseSlider extends Table {
     }
 
     private Slider initializeSlider(String value, float min, float max, float stepSize) {
-        Slider slider = new Slider(min, max, stepSize, false, BaseGame.mySkin);
+        Slider slider = new Slider(min, max, stepSize, false, AssetLoader.mySkin);
         setValue(slider, value);
         addListener(slider, value, min, max);
         return slider;
@@ -55,7 +56,7 @@ public class BaseSlider extends Table {
         slider.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                BaseGame.click1Sound.play(GameUtils.normalizeValue(slider.getValue(), min, max));
+                AssetLoader.click1Sound.play(GameUtils.normalizeValue(slider.getValue(), min, max));
                 if (value.equalsIgnoreCase("sound")) {
                     BaseGame.soundVolume = slider.getValue();
                 } else if (value.equalsIgnoreCase("music")) {
@@ -93,7 +94,7 @@ public class BaseSlider extends Table {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 label.setColor(Color.FIREBRICK);
-                BaseGame.hoverOverEnterSound.play(BaseGame.soundVolume);
+                AssetLoader.hoverOverEnterSound.play(BaseGame.soundVolume);
             }
 
             @Override

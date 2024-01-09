@@ -6,6 +6,7 @@ import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 
 import no.sandramoen.ggj2024oslo.screens.gameplay.LevelScreen;
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
@@ -32,7 +33,7 @@ public class LevelSelectScreen extends BaseScreen {
                 .width(Gdx.graphics.getWidth() * .15f)
                 .height(Gdx.graphics.getHeight() * .075f)
                 .spaceTop(Gdx.graphics.getHeight() * .01f);
-        for (int i = 0; i < BaseGame.maps.size; i++)
+        for (int i = 0; i < AssetLoader.maps.size; i++)
             uiTable.add(levelButton(i)).row();
         uiTable.defaults().reset();
     }
@@ -40,11 +41,11 @@ public class LevelSelectScreen extends BaseScreen {
     private TextButton levelButton(Integer levelNumber) {
         String buttonText = "Level " + levelNumber;
         if (levelNumber == 0) buttonText = "Test level";
-        TextButton button = new TextButton(buttonText, BaseGame.mySkin);
+        TextButton button = new TextButton(buttonText, AssetLoader.mySkin);
         button.addListener(
                 (Event event) -> {
                     if (GameUtils.isTouchDownEvent(event))
-                        BaseGame.setActiveScreen(new LevelScreen(BaseGame.maps.get(levelNumber)));
+                        BaseGame.setActiveScreen(new LevelScreen(AssetLoader.maps.get(levelNumber)));
                     return false;
                 }
         );

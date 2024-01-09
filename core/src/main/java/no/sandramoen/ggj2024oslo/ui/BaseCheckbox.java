@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.github.tommyettinger.textra.TypingLabel;
 
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
 
@@ -21,11 +22,11 @@ public class BaseCheckbox extends Table {
     private boolean isJustClicked;
 
     public BaseCheckbox(String text) {
-        label = new TypingLabel(text, new Label.LabelStyle(BaseGame.mySkin.get("Play-Bold20white", BitmapFont.class), null));
+        label = new TypingLabel(text, new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold20white", BitmapFont.class), null));
         label.setColor(Color.WHITE);
         GameUtils.setWidgetHoverColor(label);
 
-        checkBox = new CheckBox("", BaseGame.mySkin);
+        checkBox = new CheckBox("", AssetLoader.mySkin);
 
         setContainerHoverColor(checkBox, label);
 
@@ -54,7 +55,7 @@ public class BaseCheckbox extends Table {
             public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
                 super.enter(event, x, y, pointer, fromActor);
                 label.setColor(Color.FIREBRICK);
-                BaseGame.hoverOverEnterSound.play(BaseGame.soundVolume);
+                AssetLoader.hoverOverEnterSound.play(BaseGame.soundVolume);
             }
 
             @Override

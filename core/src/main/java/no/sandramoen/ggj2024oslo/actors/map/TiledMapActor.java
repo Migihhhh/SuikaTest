@@ -19,7 +19,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import java.util.ArrayList;
 import java.util.Iterator;
 
-import no.sandramoen.ggj2024oslo.actors.utils.BaseActor;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class TiledMapActor extends Actor {

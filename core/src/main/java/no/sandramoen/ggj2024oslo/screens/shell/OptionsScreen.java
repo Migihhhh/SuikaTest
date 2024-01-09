@@ -10,6 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.github.tommyettinger.textra.TypingLabel;
 
 import no.sandramoen.ggj2024oslo.ui.BaseSlider;
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
@@ -18,7 +19,7 @@ public class OptionsScreen extends BaseScreen {
 
     @Override
     public void initialize() {
-        TypingLabel mainLabel = new TypingLabel("Options", new Label.LabelStyle(BaseGame.mySkin.get("Play-Bold59white", BitmapFont.class), null));
+        TypingLabel mainLabel = new TypingLabel("Options", new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold59white", BitmapFont.class), null));
         mainLabel.getFont().scale(.8f, .8f);
         uiTable.add(mainLabel)
                 .growY()
@@ -66,7 +67,7 @@ public class OptionsScreen extends BaseScreen {
     }
 
     private TextButton initializeBackButton() {
-        TextButton backButton = new TextButton("Back", BaseGame.mySkin);
+        TextButton backButton = new TextButton("Back", AssetLoader.mySkin);
         backButton.addListener(
                 (Event event) -> {
                     if (GameUtils.isTouchDownEvent(event))

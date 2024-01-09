@@ -1,4 +1,4 @@
-package no.sandramoen.ggj2024oslo.actors.utils;
+package no.sandramoen.ggj2024oslo.utils;
 
 import static java.lang.Math.abs;
 
@@ -19,8 +19,6 @@ import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
-
-import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class BaseActor extends Group {
 
@@ -179,7 +177,7 @@ public class BaseActor extends Group {
     }
 
     public void loadImage(String name) {
-        TextureRegion region = BaseGame.textureAtlas.findRegion(name);
+        TextureRegion region = AssetLoader.textureAtlas.findRegion(name);
         if (region == null)
             Gdx.app.error(getClass().getSimpleName(), "Error: region is null. Are you sure the image '" + name + "' exists?");
         setAnimation(new Animation(1f, region));

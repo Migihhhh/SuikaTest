@@ -14,7 +14,8 @@ import com.github.tommyettinger.textra.TypingLabel;
 import no.sandramoen.ggj2024oslo.actors.Element;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
-import no.sandramoen.ggj2024oslo.actors.utils.BaseActor;
+import no.sandramoen.ggj2024oslo.utils.AssetLoader;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.screens.shell.LevelSelectScreen;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
@@ -81,7 +82,7 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeGUI() {
-        topLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", new Label.LabelStyle(BaseGame.mySkin.get("Play-Bold20white", BitmapFont.class), null));
+        topLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold20white", BitmapFont.class), null));
         topLabel.setAlignment(Align.top);
 
         uiTable.defaults().padTop(Gdx.graphics.getHeight() * .02f);

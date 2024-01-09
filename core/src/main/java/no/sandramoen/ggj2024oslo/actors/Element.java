@@ -4,7 +4,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
-import no.sandramoen.ggj2024oslo.actors.utils.BaseActor;
+import no.sandramoen.ggj2024oslo.utils.BaseActor;
 
 public class Element extends BaseActor {
     public boolean isDead;
