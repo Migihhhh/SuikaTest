@@ -16,7 +16,7 @@ class DesktopLauncher {
         config.setTitle("Global Game Jam 2024");
         config.setResizable(false);
         config.useVsync(true);
-        // config.setWindowIcon("images/excluded/icon_16x16.png", "images/excluded/icon_32x32.png");
+        config.setWindowIcon("images/excluded/icon_16x16.png", "images/excluded/icon_32x32.png", "images/excluded/icon_64x64.png");
 
         boolean isFullscreen = false;
         if (isFullscreen)
