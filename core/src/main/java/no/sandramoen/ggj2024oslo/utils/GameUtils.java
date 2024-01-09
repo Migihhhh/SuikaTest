@@ -2,6 +2,8 @@ package no.sandramoen.ggj2024oslo.utils;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.controllers.Controller;
+import com.badlogic.gdx.controllers.Controllers;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
@@ -9,6 +11,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
@@ -60,8 +63,69 @@ public class GameUtils {
         music.play();
     }
 
-    public static void stopAllMusic() {
+    public static void setMusicVolume(float volume) {
+        if (volume > 1f || volume < 0f)
+            logError("Volume needs to be within [0-1]. Volume is: " + volume);
+        BaseGame.musicVolume = volume;
+        setAllMusicVolumes(volume);
+    }
 
+    private static void setAllMusicVolumes(float volume) {
+        for (Music music : AssetLoader.music)
+            music.setVolume(volume);
+    }
+
+    public static void stopAllMusic() {
+        for (Music music : AssetLoader.music)
+            music.stop();
+    }
+
+    public static void addWidgetEnterExitEffect(Widget widget, Color enterColor, Color exitColor) {
+        widget.addListener(new ClickListener() {
+            @Override
+            public void enter(InputEvent event, float x, float y, int pointer, Actor fromActor) {
+                widget.addAction(Actions.color(enterColor, 0.125f));
+                AssetLoader.hoverOverEnterSound.play(BaseGame.soundVolume);
+                super.enter(event, x, y, pointer, fromActor);
+            }
+
+            @Override
+            public void exit(InputEvent event, float x, float y, int pointer, Actor toActor) {
+                widget.addAction(Actions.color(exitColor, 0.125f));
+                super.exit(event, x, y, pointer, toActor);
+            }
+        });
+    }
+
+    public static void vibrateController(int duration, float strength) {
+        try {
+            Controller[] controllers = Controllers.getControllers().toArray();
+            if (controllers.length > 0) {
+                Controller controller = controllers[0];
+                if (strength < 0 || strength > 1) {
+                    logError("Error, vibrating strength must be [0, 1], strength is: " + strength);
+                }
+                if (BaseGame.vibrationStrength > 0 && controller.canVibrate()) {
+                    controller.startVibration(duration, strength * BaseGame.vibrationStrength);
+                }
+            }
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            logError("Error fetching controller: " + indexOutOfBoundsException);
+        }
+    }
+
+    public void cancelControllerVibration() {
+        try {
+            Controller[] controllers = Controllers.getControllers().toArray();
+            if (controllers.length > 0) {
+                Controller controller = controllers[0];
+                if (controller.isVibrating()) {
+                    controller.cancelVibration();
+                }
+            }
+        } catch (IndexOutOfBoundsException indexOutOfBoundsException) {
+            logError("Error fetching controller: " + indexOutOfBoundsException);
+        }
     }
 
     public static float normalizeValue(float value, float min, float max) {
@@ -76,7 +140,7 @@ public class GameUtils {
         ShaderProgram.pedantic = false;
         ShaderProgram shaderProgram = new ShaderProgram(vertexShader, fragmentShader);
         if (!shaderProgram.isCompiled())
-            Gdx.app.error(GameUtils.class.getSimpleName(), "Error: Couldn't compile shader => " + shaderProgram.getLog());
+            logError("Error: Couldn't compile shader => " + shaderProgram.getLog());
         return shaderProgram;
     }
 
@@ -117,5 +181,10 @@ public class GameUtils {
 
     public static float distanceBetween(Vector2 k1, Vector2 k2) {
         return (float) Math.sqrt(Math.pow(Math.abs(k2.x - k1.x), 2) + Math.pow(Math.abs(k2.y - k1.y), 2));
+    }
+
+
+    private static void logError(String message) {
+        Gdx.app.error(GameUtils.class.getSimpleName(), message);
     }
 }

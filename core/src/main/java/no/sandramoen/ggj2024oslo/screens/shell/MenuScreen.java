@@ -10,7 +10,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
-import no.sandramoen.ggj2024oslo.ui.MadeByLabel;
+import no.sandramoen.ggj2024oslo.gui.MadeByLabel;
 import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;

@@ -1,4 +1,4 @@
-package no.sandramoen.ggj2024oslo.ui;
+package no.sandramoen.ggj2024oslo.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
@@ -22,7 +22,7 @@ public class BaseCheckbox extends Table {
     private boolean isJustClicked;
 
     public BaseCheckbox(String text) {
-        label = new TypingLabel(text, new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold20white", BitmapFont.class), null));
+        label = new TypingLabel(text, AssetLoader.getLabelStyle("Play-Bold20white"));
         label.setColor(Color.WHITE);
         GameUtils.setWidgetHoverColor(label);
 

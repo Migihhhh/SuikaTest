@@ -9,7 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.github.tommyettinger.textra.TypingLabel;
 
-import no.sandramoen.ggj2024oslo.ui.BaseSlider;
+import no.sandramoen.ggj2024oslo.gui.BaseSlider;
 import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
@@ -19,7 +19,7 @@ public class OptionsScreen extends BaseScreen {
 
     @Override
     public void initialize() {
-        TypingLabel mainLabel = new TypingLabel("Options", new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold59white", BitmapFont.class), null));
+        TypingLabel mainLabel = new TypingLabel("Options", AssetLoader.getLabelStyle("Play-Bold59white"));
         mainLabel.getFont().scale(.8f, .8f);
         uiTable.add(mainLabel)
                 .growY()
@@ -53,9 +53,9 @@ public class OptionsScreen extends BaseScreen {
     private Table optionsTable() {
         Table table = new Table();
 
-        BaseSlider soundSlider = new BaseSlider("Sound", 0, 1, .1f);
-        BaseSlider musicSlider = new BaseSlider("Music", 0, 1, .1f);
-        BaseSlider voiceSlider = new BaseSlider("Voice", 0, 1, .1f);
+        BaseSlider soundSlider = new BaseSlider("Sound", "Sound");
+        BaseSlider musicSlider = new BaseSlider("Music", "Music");
+        BaseSlider voiceSlider = new BaseSlider("Voice", "Voice");
 
         table.defaults().spaceTop(Gdx.graphics.getHeight() * .05f).width(Gdx.graphics.getWidth() * .6f);
         table.add(soundSlider).row();

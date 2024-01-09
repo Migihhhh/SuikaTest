@@ -1,4 +1,4 @@
-package no.sandramoen.ggj2024oslo.ui;
+package no.sandramoen.ggj2024oslo.gui;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;

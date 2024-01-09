@@ -6,10 +6,12 @@ import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.audio.Sound;
+import com.badlogic.gdx.graphics.g2d.BitmapFont;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.maps.tiled.TmxMapLoader;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 
@@ -24,6 +26,7 @@ public class AssetLoader implements AssetErrorListener {
     public static Sound click1Sound;
     public static Sound hoverOverEnterSound;
 
+    public static Array<Music> music;
     public static Music menuMusic;
 
     public static Array<TiledMap> maps;
@@ -47,6 +50,10 @@ public class AssetLoader implements AssetErrorListener {
     @Override
     public void error(AssetDescriptor asset, Throwable throwable) {
         Gdx.app.error(AssetLoader.class.getSimpleName(), "Could not load asset: " + asset.fileName, throwable);
+    }
+
+    public static Label.LabelStyle getLabelStyle(String fontName) {
+        return new Label.LabelStyle(AssetLoader.mySkin.get(fontName, BitmapFont.class), null);
     }
 
     private static void loadAssets() {
@@ -86,7 +93,9 @@ public class AssetLoader implements AssetErrorListener {
         textureAtlas = BaseGame.assetManager.get("images/included/packed/images.pack.atlas");
 
         // music
+        music = new Array();
         // menuMusic = assetManager.get("audio/music/587251__lagmusics__epic-and-aggressive-percussion.mp3", Music.class);
+        // music.add(menuMusic);
 
         // sounds
         click1Sound = BaseGame.assetManager.get("audio/sound/click1.wav", Sound.class);

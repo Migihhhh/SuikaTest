@@ -82,7 +82,7 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeGUI() {
-        topLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", new Label.LabelStyle(AssetLoader.mySkin.get("Play-Bold20white", BitmapFont.class), null));
+        topLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
         topLabel.setAlignment(Align.top);
 
         uiTable.defaults().padTop(Gdx.graphics.getHeight() * .02f);
