@@ -11,16 +11,15 @@ import com.badlogic.gdx.utils.Array;
 import no.sandramoen.ggj2024oslo.actors.Element;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
-import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class MapLoader {
     public Element player;
     public Array<ImpassableTerrain> impassables;
 
-    private TiledMapActor tilemap;
-    private Stage mainStage;
-    private Engine engine;
-    private World world;
+    private final TiledMapActor tilemap;
+    private final Stage mainStage;
+    private final Engine engine;
+    private final World world;
 
     public MapLoader(Stage mainStage, Engine engine, World world, TiledMapActor tilemap,
                      Element player, Array<ImpassableTerrain> impassables) {
@@ -32,25 +31,28 @@ public class MapLoader {
         this.player = player;
         this.impassables = impassables;
 
-        initializeElement();
-        initializeImpassables();
+        initializeActor("player");
+        initializeActors("impassable");
     }
 
-    private void initializeImpassables() {
-        if (tilemap.getTileList("actors", "impassable").size() > 0)
-            for (MapObject mapObject : tilemap.getTileList("actors", "impassable")) {
-                MapProperties mapProperties = mapObject.getProperties();
-                float x = mapProperties.get("x", Float.class) * BaseGame.UNIT_SCALE;
-                float y = mapProperties.get("y", Float.class) * BaseGame.UNIT_SCALE;
-                float width = mapProperties.get("width", Float.class) * BaseGame.UNIT_SCALE;
-                float height = mapProperties.get("height", Float.class) * BaseGame.UNIT_SCALE;
-                impassables.add(new ImpassableTerrain(x, y, width, height, mainStage));
-            }
-    }
-
-    private void initializeElement() {
+    private void initializeActors(String propertyName) {
         String layerName = "actors";
-        String propertyName = "player";
+
+        if (tilemap.getTileList(layerName, propertyName).size() <= 0)
+            return;
+
+        for (MapObject mapObject : tilemap.getTileList(layerName, propertyName)) {
+            MapProperties mapProperties = mapObject.getProperties();
+            float x = mapProperties.get("x", Float.class) * BaseGame.UNIT_SCALE;
+            float y = mapProperties.get("y", Float.class) * BaseGame.UNIT_SCALE;
+            float width = mapProperties.get("width", Float.class) * BaseGame.UNIT_SCALE;
+            float height = mapProperties.get("height", Float.class) * BaseGame.UNIT_SCALE;
+            impassables.add(new ImpassableTerrain(x, y, width, height, mainStage));
+        }
+    }
+
+    private void initializeActor(String propertyName) {
+        String layerName = "actors";
         if (tilemap.getTileList(layerName, propertyName).size() == 1) {
             MapObject mapObject = tilemap.getTileList(layerName, propertyName).get(0);
             float x = mapObject.getProperties().get("x", Float.class) * BaseGame.UNIT_SCALE;

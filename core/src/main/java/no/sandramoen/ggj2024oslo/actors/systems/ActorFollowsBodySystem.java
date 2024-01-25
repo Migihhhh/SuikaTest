@@ -21,7 +21,6 @@ public class ActorFollowsBodySystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        System.out.println("banana");
 
         ActorComponent actorComponent = actors.get(entity);
         BodyComponent bodyComponent = bodies.get(entity);

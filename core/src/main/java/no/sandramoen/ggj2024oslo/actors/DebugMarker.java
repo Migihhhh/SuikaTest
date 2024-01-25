@@ -22,7 +22,7 @@ public class DebugMarker extends BaseActor {
 
     private void init() {
         loadImage("whitePixel");
-        setSize(.5f, .5f);
+        setSize(.125f, .125f);
         setColor(Color.CYAN);
         centerAtPosition(getX(), getY());
         setOrigin(Align.center);

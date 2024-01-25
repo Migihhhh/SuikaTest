@@ -13,7 +13,7 @@ import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
 
 public class PlayerControlSystem extends IteratingSystem {
     private final ComponentMapper<BodyComponent> bodies = ComponentMapper.getFor(BodyComponent.class);
-    private final float impulse = .1f;
+    private final float impulse = .025f;
 
     public PlayerControlSystem() {
         super(Family.all(ActorComponent.class, BodyComponent.class, PlayerControlComponent.class).get());

@@ -16,7 +16,7 @@ public class Background extends BaseActor {
         super(x, y, stage);
         animationImages.add(AssetLoader.textureAtlas.findRegion("grass"));
         animation = new Animation(2f, animationImages, Animation.PlayMode.LOOP);
-        setAnimation(animation);/*
-        setSize(TiledMapActor.mapWidth, TiledMapActor.mapHeight);*/
+        setAnimation(animation);
+        setSize(TiledMapActor.mapTileWidth / 2, TiledMapActor.mapTileHeight / 2);
     }
 }

@@ -13,6 +13,7 @@ import com.github.tommyettinger.textra.TypingLabel;
 import box2dLight.Light;
 import box2dLight.PointLight;
 import no.sandramoen.ggj2024oslo.actors.Element;
+import no.sandramoen.ggj2024oslo.actors.map.Background;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.screens.shell.MenuScreen;
@@ -35,6 +36,7 @@ public class LevelScreen extends BaseScreen {
     private TiledMapActor tilemap;
 
     public LevelScreen(TiledMap tiledMap) {
+        super(tiledMap);
         currentMap = tiledMap;
         this.tilemap = new TiledMapActor(currentMap, mainStage);
         isBox2d = true;
@@ -51,6 +53,7 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float delta) {
+
     }
 
     @Override
@@ -61,9 +64,6 @@ public class LevelScreen extends BaseScreen {
             BaseGame.setActiveScreen(new LevelScreen(currentMap));
         } else if (keycode == Keys.T) {
             BaseGame.setActiveScreen(new LevelSelectScreen());
-        } else if (keycode == Keys.NUMPAD_0) {
-            OrthographicCamera camera = (OrthographicCamera) mainStage.getCamera();
-            camera.zoom += .1f;
         } else if (keycode == Keys.F1) {
             toggleWorldDebug();
         } else if (keycode == Keys.F2) {
@@ -81,8 +81,8 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeLights() {
-        new PointLight(rayHandler, 2048, Color.MAGENTA, 100, 1, 1);
-
+        new PointLight(rayHandler, 2048, Color.MAGENTA, 10, 3, 2);
+        new PointLight(rayHandler, 2048, Color.GREEN, 10, 11, 5);
         initializeAmbientLight();
     }
 
@@ -99,9 +99,9 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeActors() {
+        new Background(0, 0, mainStage);
         impassables = new Array();
         loadActorsFromMap();
-        // new Background(0, 0, mainStage);
     }
 
     private void loadActorsFromMap() {

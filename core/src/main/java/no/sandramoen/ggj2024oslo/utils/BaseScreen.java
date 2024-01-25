@@ -8,6 +8,7 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.controllers.Controller;
 import com.badlogic.gdx.controllers.ControllerListener;
 import com.badlogic.gdx.graphics.GL20;
+import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.physics.box2d.World;
@@ -38,7 +39,7 @@ public abstract class BaseScreen implements Screen, InputProcessor, ControllerLi
 
     public BaseScreen() {
         mainStage = new Stage();
-        mainStage.setViewport(new ExtendViewport(80, 45));
+        mainStage.setViewport(new ExtendViewport(45, 80));
 
         uiTable = new Table();
         uiTable.setFillParent(true);
@@ -61,6 +62,13 @@ public abstract class BaseScreen implements Screen, InputProcessor, ControllerLi
         rayHandler.setCulling(true);
 
         initialize();
+    }
+
+    public BaseScreen(TiledMap tiledMap) {
+        this();
+        int mapWidth = tiledMap.getProperties().get("width", Integer.class);
+        int mapHeight = tiledMap.getProperties().get("height", Integer.class);
+        mainStage.setViewport(new ExtendViewport(mapWidth, mapHeight));
     }
 
     public abstract void initialize();

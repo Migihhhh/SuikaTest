@@ -30,7 +30,7 @@ public class Element extends BaseActor {
         super(x, y, stage, engine);
 
         loadImage("whitePixel");
-        setSize(4, 4);
+        setSize(.35f, .35f);
 
         body = createBody(world);
         entity.add(new BodyComponent(body));
@@ -60,8 +60,7 @@ public class Element extends BaseActor {
         body.setUserData(this);
 
         CircleShape circle = new CircleShape();
-        float watermelonRadius = .35f / 2;
-        circle.setRadius(watermelonRadius);
+        circle.setRadius(getWidth() / 2);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
