@@ -8,13 +8,17 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.glutils.ShaderProgram;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.math.Vector3;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Event;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.scenes.scene2d.ui.Widget;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Array;
+
+import no.sandramoen.ggj2024oslo.actors.DebugMarker;
 
 public class GameUtils {
 
@@ -169,6 +173,17 @@ public class GameUtils {
     public static void printLoadingTime(String tag, String message, long startTime) {
         long endTime = System.currentTimeMillis();
         Gdx.app.log(tag, message + " took " + (endTime - startTime) + " ms to load.");
+    }
+
+    public static void printMousePosition(int screenX, int screenY, Stage stage) {
+        Vector3 mainStageWorldCoordinates = stage.getViewport().unproject(new Vector3((float) screenX, (float) screenY, 0f));
+        double roundOffX = Math.round(mainStageWorldCoordinates.x * 100.0) / 100.0;
+        double roundOffY = Math.round(mainStageWorldCoordinates.y * 100.0) / 100.0;
+
+        Gdx.app.log(GameUtils.class.getSimpleName(), "position mouse was clicked: " + roundOffX + "f, " + roundOffY + "f");
+        Gdx.app.getClipboard().setContents(roundOffX + "f, " + roundOffY + "f");
+
+        new DebugMarker((float) roundOffX, (float) roundOffY, stage);
     }
 
     public static boolean isDistanceBigEnough(Vector2 k1, Vector2 k2, float distance) {

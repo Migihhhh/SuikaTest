@@ -1,8 +1,10 @@
-package no.sandramoen.ggj2024oslo.screens.gameplay;
+package no.sandramoen.ggj2024oslo.utils;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.MapProperties;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 
@@ -17,11 +19,15 @@ public class MapLoader {
 
     private TiledMapActor tilemap;
     private Stage mainStage;
+    private Engine engine;
+    private World world;
 
-    public MapLoader(Stage mainStage, TiledMapActor tilemap,
+    public MapLoader(Stage mainStage, Engine engine, World world, TiledMapActor tilemap,
                      Element player, Array<ImpassableTerrain> impassables) {
         this.tilemap = tilemap;
         this.mainStage = mainStage;
+        this.engine = engine;
+        this.world = world;
 
         this.player = player;
         this.impassables = impassables;
@@ -49,7 +55,7 @@ public class MapLoader {
             MapObject mapObject = tilemap.getTileList(layerName, propertyName).get(0);
             float x = mapObject.getProperties().get("x", Float.class) * BaseGame.UNIT_SCALE;
             float y = mapObject.getProperties().get("y", Float.class) * BaseGame.UNIT_SCALE;
-            player = new Element(x, y, mainStage);
+            player = new Element(x, y, mainStage, engine, world);
         } else if (tilemap.getTileList(layerName, propertyName).size() > 1) {
             Gdx.app.error(getClass().getSimpleName(), "Error => found more than one property: " + propertyName + " on layer: " + layerName + "!");
         } else {

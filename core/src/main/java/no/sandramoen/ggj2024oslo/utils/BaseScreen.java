@@ -1,5 +1,6 @@
 package no.sandramoen.ggj2024oslo.utils;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.InputProcessor;
@@ -17,11 +18,14 @@ import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 
 import box2dLight.RayHandler;
+import no.sandramoen.ggj2024oslo.actors.systems.ActorFollowsBodySystem;
+import no.sandramoen.ggj2024oslo.actors.systems.PlayerControlSystem;
 
 public abstract class BaseScreen implements Screen, InputProcessor, ControllerListener {
     protected Stage mainStage;
     protected Stage uiStage;
     protected Table uiTable;
+    protected Engine engine;
 
     private boolean isPause;
     protected float dtModifier = 1f;
@@ -41,6 +45,10 @@ public abstract class BaseScreen implements Screen, InputProcessor, ControllerLi
         uiStage = new Stage();
         uiStage.setViewport(new ScreenViewport());
         uiStage.addActor(uiTable);
+
+        engine = new Engine();
+        engine.addSystem(new ActorFollowsBodySystem());
+        engine.addSystem(new PlayerControlSystem());
 
         World.setVelocityThreshold(1.0f);
         world = new World(new Vector2(0f, -9.81f), true);
@@ -66,6 +74,7 @@ public abstract class BaseScreen implements Screen, InputProcessor, ControllerLi
             mainStage.act(delta * dtModifier);
             if (isBox2d)
                 rayHandler.update();
+            engine.update(delta * dtModifier);
             update(delta * dtModifier);
         }
 

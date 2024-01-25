@@ -1,4 +1,5 @@
-package no.sandramoen.ggj2024oslo.actors.utils;
+package no.sandramoen.ggj2024oslo.actors;
+
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.Batch;
@@ -29,14 +30,14 @@ public class ShockwaveBackground extends BaseActor {
         shaderProgram = GameUtils.initShaderProgram(AssetLoader.defaultShader, AssetLoader.shockwaveShader);
 
         addListener(
-                (Event event) -> {
-                    if (GameUtils.isTouchDownEvent(event)) {
-                        float xNormalized = Gdx.input.getX() / (float) Gdx.graphics.getWidth();
-                        float yNormalized = Gdx.input.getY() / (float) Gdx.graphics.getHeight();
-                        start(xNormalized, yNormalized);
-                    }
-                    return false;
+            (Event event) -> {
+                if (GameUtils.isTouchDownEvent(event)) {
+                    float xNormalized = Gdx.input.getX() / (float) Gdx.graphics.getWidth();
+                    float yNormalized = Gdx.input.getY() / (float) Gdx.graphics.getHeight();
+                    start(xNormalized, yNormalized);
                 }
+                return false;
+            }
         );
     }
 

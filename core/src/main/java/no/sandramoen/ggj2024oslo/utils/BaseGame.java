@@ -29,6 +29,11 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     public static float vibrationStrength = 1f;
     public static final float UNIT_SCALE = 1 / 16f;
 
+    public static final short BOX2D_ALL = -1;
+    public static final short BOX2D_NONE = 0;
+    public static final short BOX2D_ONE = 2;
+    public static final short BOX2D_TWO = 4;
+
     public BaseGame() {
         game = this;
     }

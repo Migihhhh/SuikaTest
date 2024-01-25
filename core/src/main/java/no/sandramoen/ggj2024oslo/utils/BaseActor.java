@@ -2,6 +2,8 @@ package no.sandramoen.ggj2024oslo.utils;
 
 import static java.lang.Math.abs;
 
+import com.badlogic.ashley.core.Engine;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
@@ -20,6 +22,8 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 
+import no.sandramoen.ggj2024oslo.actors.components.ActorComponent;
+
 public class BaseActor extends Group {
 
     protected static Rectangle worldBounds;
@@ -34,6 +38,8 @@ public class BaseActor extends Group {
     private float maxSpeed = 1000f;
     private float deceleration = 0f;
     private Polygon boundaryPolygon = null;
+    private Engine engine;
+    protected Entity entity;
 
     public boolean isFacingRight = true;
     public boolean pause = false;
@@ -62,6 +68,21 @@ public class BaseActor extends Group {
 
         boundaryPolygon = null;
         /*setDebug(true);*/
+    }
+
+    public BaseActor(float x, float y, Stage stage, Engine engine) {
+        this(x, y, stage);
+        this.engine = engine;
+
+        entity = new Entity();
+        entity.add(new ActorComponent(this));
+    }
+
+    @Override
+    public boolean remove() {
+        if (engine != null)
+            engine.removeEntity(entity);
+        return super.remove();
     }
 
     @Override
