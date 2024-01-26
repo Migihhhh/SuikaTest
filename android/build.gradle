@@ -49,6 +49,12 @@ repositories {
   google()
 }
 
+java {
+  toolchain {
+    languageVersion = JavaLanguageVersion.of(17) // Android currently requires Java 17.
+  }
+}
+
 configurations { natives }
 
 dependencies {
@@ -97,6 +103,9 @@ tasks.register('copyAndroidNatives') {
 
 tasks.matching { it.name.contains("merge") && it.name.contains("JniLibFolders") }.configureEach { packageTask ->
   packageTask.dependsOn 'copyAndroidNatives'
+}
+tasks.matching { it.name.contains("merge") && it.name.contains("Assets")}.configureEach {
+  dependsOn(project(":core").tasks.named("packTextures"))
 }
 
 tasks.register('run', Exec) {
