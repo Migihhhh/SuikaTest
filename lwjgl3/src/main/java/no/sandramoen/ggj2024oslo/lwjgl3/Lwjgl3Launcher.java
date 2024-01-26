@@ -1,16 +1,16 @@
 package no.sandramoen.ggj2024oslo.lwjgl3;
 
+import com.badlogic.gdx.Graphics;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
-
-import java.awt.Dimension;
-import java.util.Locale;
-
 import no.sandramoen.ggj2024oslo.MyGdxGame;
 
+import java.util.Locale;
+
 // Please note that on macOS your application needs to be started with the -XstartOnFirstThread JVM argument
-class DesktopLauncher {
+class Lwjgl3Launcher {
     public static void main(String[] arg) {
+        if (StartupHelper.startNewJvmIfRequired(true)) return; // This handles macOS support and helps on Windows.
         Lwjgl3ApplicationConfiguration config = new Lwjgl3ApplicationConfiguration();
         config.setForegroundFPS(60);
         config.setTitle("Global Game Jam 2024");
@@ -34,7 +34,7 @@ class DesktopLauncher {
     }
 
     private static void setWindowedMode(float percentOfScreenSize, Lwjgl3ApplicationConfiguration config) {
-        Dimension dimension = java.awt.Toolkit.getDefaultToolkit().getScreenSize();
+        Graphics.DisplayMode dimension = Lwjgl3ApplicationConfiguration.getDisplayMode();
         int width = (int) (dimension.width * percentOfScreenSize);
 
         float aspectRatio = 16 / 9f;
