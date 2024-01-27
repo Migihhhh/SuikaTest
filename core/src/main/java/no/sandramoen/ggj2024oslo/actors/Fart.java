@@ -1,7 +1,5 @@
 package no.sandramoen.ggj2024oslo.actors;
 
-import static no.sandramoen.ggj2024oslo.utils.BaseGame.BOX2D_ALL;
-
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
@@ -19,20 +17,19 @@ import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
-public class Element extends BaseActor {
+public class Fart extends BaseActor {
     public boolean isDead;
     public enum Type {RED, YELLOW, BLUE}
 
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
-    private Body body;
 
-    public Element(float x, float y, Stage stage, Engine engine, World world) {
+    public Fart(float x, float y, Stage stage, Engine engine, World world) {
         super(x, y, stage, engine);
 
         loadImage("whitePixel");
         setSize(.35f, .35f);
 
-        body = createBody(world);
+        Body body = createBody(world);
         entity.add(new BodyComponent(body));
         entity.add(new PlayerControlComponent());
         engine.addEntity(entity);
@@ -67,14 +64,13 @@ public class Element extends BaseActor {
         fixtureDef.density = 1f;
         fixtureDef.restitution = .1f;
 
-        fixtureDef.filter.categoryBits = BaseGame.BOX2D_ALL;
-        fixtureDef.filter.maskBits = BaseGame.BOX2D_ONE;
+        fixtureDef.filter.categoryBits = BaseGame.BOX2D_ONE;
+        fixtureDef.filter.maskBits = BaseGame.BOX2D_ALL;
 
         Fixture fixture = body.createFixture(fixtureDef);
-        fixture.setUserData("element");
+        fixture.setUserData("fart");
         circle.dispose();
 
         return body;
     }
-
 }

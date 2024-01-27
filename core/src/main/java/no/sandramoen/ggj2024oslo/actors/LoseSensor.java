@@ -1,11 +1,10 @@
-package no.sandramoen.ggj2024oslo.actors.map;
+package no.sandramoen.ggj2024oslo.actors;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
-import com.badlogic.gdx.physics.box2d.CircleShape;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
@@ -17,14 +16,15 @@ import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
-public class ImpassableTerrain extends BaseActor {
+public class LoseSensor extends BaseActor {
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
-    public ImpassableTerrain(float x, float y, float width, float height, Stage stage, Engine engine, World world) {
+    public LoseSensor(float x, float y, float width, float height, Stage stage, Engine engine, World world) {
         super(x, y, stage, engine);
 
         loadImage("whitePixel");
-        setColor(Color.DARK_GRAY);
+        setColor(Color.CYAN);
+        getColor().a = .25f;
         setSize(width, height);
 
         Body body = createBody(world);
@@ -48,14 +48,13 @@ public class ImpassableTerrain extends BaseActor {
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = rectangle;
-        fixtureDef.density = 1f;
-        fixtureDef.restitution = 0.1f;
+        fixtureDef.isSensor = true;
 
-        fixtureDef.filter.categoryBits = BaseGame.BOX2D_TWO;
+        fixtureDef.filter.categoryBits = BaseGame.BOX2D_ALL;
         fixtureDef.filter.maskBits = BaseGame.BOX2D_ALL;
 
         Fixture fixture = body.createFixture(fixtureDef);
-        fixture.setUserData("impassable");
+        fixture.setUserData("loseSensor");
         rectangle.dispose();
 
         return body;

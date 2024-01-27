@@ -12,8 +12,9 @@ import com.github.tommyettinger.textra.TypingLabel;
 
 import box2dLight.Light;
 import box2dLight.PointLight;
-import no.sandramoen.ggj2024oslo.actors.Element;
+import no.sandramoen.ggj2024oslo.actors.Fart;
 import no.sandramoen.ggj2024oslo.actors.Background;
+import no.sandramoen.ggj2024oslo.actors.LoseSensor;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.screens.shell.MenuScreen;
@@ -27,12 +28,12 @@ import no.sandramoen.ggj2024oslo.utils.MapLoader;
 public class LevelScreen extends BaseScreen {
     private TiledMap currentMap;
 
+    private Fart player;
+    private LoseSensor loseSensor;
     private Array<ImpassableTerrain> impassables;
-    private Element player;
 
     private TypingLabel topLabel;
-
-    private TiledMapActor tilemap;
+    private final TiledMapActor tilemap;
 
     public LevelScreen(TiledMap tiledMap) {
         super(tiledMap);
@@ -43,7 +44,7 @@ public class LevelScreen extends BaseScreen {
         initializeLights();
         initializeActors();
         initializeGUI();
-        mapCenterCamera();
+        delayedMapCenterCamera();
     }
 
     @Override
@@ -102,11 +103,11 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void loadActorsFromMap() {
-        MapLoader mapLoader = new MapLoader(mainStage, engine, world, tilemap, player, impassables);
+        MapLoader mapLoader = new MapLoader(mainStage, engine, world, tilemap, player, impassables, loseSensor);
         player = mapLoader.player;
     }
 
-    private void mapCenterCamera() {
+    private void delayedMapCenterCamera() {
         new BaseActor(0, 0, mainStage).addAction(Actions.run(() -> {
             TiledMapActor.centerPositionCamera(mainStage);
             OrthographicCamera camera = (OrthographicCamera) mainStage.getCamera();

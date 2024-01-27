@@ -79,8 +79,6 @@ public class AssetLoader implements AssetErrorListener {
         // tiled maps
         BaseGame.assetManager.setLoader(TiledMap.class, new TmxMapLoader(new InternalFileHandleResolver()));
         BaseGame.assetManager.load("maps/test.tmx", TiledMap.class);
-        BaseGame.assetManager.load("maps/level1.tmx", TiledMap.class);
-        BaseGame.assetManager.load("maps/level2.tmx", TiledMap.class);
 
         // other
         // BaseGame.assetManager.load(AssetDescriptor("other/jentenavn.csv", Text::class.java, TextLoader.TextParameter()))

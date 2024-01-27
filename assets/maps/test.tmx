@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="9" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="36">
+<map version="1.9" tiledversion="1.9.2" orientation="orthogonal" renderorder="right-down" width="9" height="16" tilewidth="16" tileheight="16" infinite="0" nextlayerid="9" nextobjectid="37">
  <tileset firstgid="1" name="Assets" tilewidth="32" tileheight="32" tilecount="64" columns="8">
   <image source="assets.png" width="256" height="256"/>
   <tile id="0">
@@ -38,7 +38,7 @@
   </data>
  </layer>
  <objectgroup id="2" name="actors">
-  <object id="5" gid="1" x="48" y="144" width="32" height="32">
+  <object id="5" gid="1" x="48" y="48" width="32" height="32">
    <properties>
     <property name="name" value="banana"/>
    </properties>
@@ -46,5 +46,10 @@
   <object id="22" gid="9" x="-14" y="240" width="16" height="240"/>
   <object id="23" gid="9" x="0" y="256" width="144" height="16"/>
   <object id="25" gid="9" x="142" y="240" width="16" height="240"/>
+  <object id="36" gid="9" x="0" y="4" width="144" height="16">
+   <properties>
+    <property name="name" value="loseSensor"/>
+   </properties>
+  </object>
  </objectgroup>
 </map>
