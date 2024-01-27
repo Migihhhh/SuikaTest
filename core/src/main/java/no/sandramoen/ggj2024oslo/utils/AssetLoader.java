@@ -26,6 +26,7 @@ public class AssetLoader implements AssetErrorListener {
     public static Sound click1Sound;
     public static Sound hoverOverEnterSound;
     public static Sound clockTickingSound;
+    public static Sound gameOverSound;
 
     public static Array<Music> music;
     public static Music levelMusic;
@@ -67,6 +68,7 @@ public class AssetLoader implements AssetErrorListener {
         BaseGame.assetManager.load("audio/sound/click1.wav", Sound.class);
         BaseGame.assetManager.load("audio/sound/hoverOverEnter.wav", Sound.class);
         BaseGame.assetManager.load("audio/sound/clock ticking.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/Game over FIJ Bsw.wav", Sound.class);
 
         // i18n
 
@@ -99,6 +101,7 @@ public class AssetLoader implements AssetErrorListener {
         click1Sound = BaseGame.assetManager.get("audio/sound/click1.wav", Sound.class);
         hoverOverEnterSound = BaseGame.assetManager.get("audio/sound/hoverOverEnter.wav", Sound.class);
         clockTickingSound = BaseGame.assetManager.get("audio/sound/clock ticking.wav", Sound.class);
+        gameOverSound = BaseGame.assetManager.get("audio/sound/Game over FIJ Bsw.wav", Sound.class);
 
         // i18n
 

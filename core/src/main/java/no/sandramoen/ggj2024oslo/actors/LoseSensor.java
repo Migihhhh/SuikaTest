@@ -24,7 +24,7 @@ public class LoseSensor extends BaseActor {
         super(x, y, stage, engine);
 
         loadImage("whitePixel");
-        setColor(Color.CYAN);
+        setColor(Color.RED);
         getColor().a = 0f;
         setSize(width, height);
 
@@ -45,6 +45,11 @@ public class LoseSensor extends BaseActor {
     }
 
     public void stopCountDown() {
+        if (!hasActions())
+            return;
+
+        System.out.println("banana");
+
         clearActions();
         addAction(Actions.alpha(0f, .5f));
     }

@@ -250,6 +250,9 @@ public class LevelScreen extends BaseScreen {
         gameOverLabel.restart();
         restartLabel.setVisible(true);
         restartLabel.restart();
+
+        AssetLoader.levelMusic.stop();
+        AssetLoader.gameOverSound.play(BaseGame.soundVolume);
         AssetLoader.clockTickingSound.stop(tickingSoundID);
     }
 
