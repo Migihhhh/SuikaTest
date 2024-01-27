@@ -2,6 +2,7 @@ package no.sandramoen.ggj2024oslo.screens.gameplay;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input.Keys;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
@@ -61,6 +62,8 @@ public class LevelScreen extends BaseScreen {
         initializeActors();
         initializeGUI();
         delayedMapCenterCamera();
+
+        AssetLoader.fartSounds.get(0).get(0).play(1f); // sound hack
     }
 
     @Override
@@ -131,6 +134,7 @@ public class LevelScreen extends BaseScreen {
                         addToScore(MathUtils.ceil(fart.size));
                         int currentIndex = findIndexOfSize(fart.size);
                         float nextSize = getNextSize(currentIndex);
+                        playFartSound(currentIndex);
                         new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
                     }
                     fart.remove();
@@ -157,6 +161,36 @@ public class LevelScreen extends BaseScreen {
             return BaseGame.sizes.get(BaseGame.sizes.size - 1);
         }
     }
+
+    private void playFartSound(int currentIndex) {
+        Array<Sound> levelSounds = AssetLoader.fartSounds.get(currentIndex);
+        int random = MathUtils.random(levelSounds.size - 1);
+        Sound randomSound = levelSounds.get(random);
+
+        // Calculate modifier based on the current level using a logarithmic function
+        float minModifier = 0.2f;
+        float maxModifier = 1.0f;
+
+        for (int i = 0; i <= 10; i++) {
+            float modifier = calculateLogarithmicModifier(i, minModifier, maxModifier);
+            System.out.println("Level " + i + ": m = " + modifier);
+        }
+
+        float modifier = calculateLogarithmicModifier(currentIndex, minModifier, maxModifier);
+
+        modifier = MathUtils.clamp(modifier, minModifier, maxModifier);
+        randomSound.play(BaseGame.soundVolume * modifier);
+    }
+
+    private float calculateLogarithmicModifier(int currentIndex, float minModifier, float maxModifier) {
+        float logBase = 11f;  // You can adjust the base of the logarithm as needed
+        float logValue = (float) Math.log(currentIndex + 1) / (float) Math.log(logBase);
+        return MathUtils.lerp(minModifier, maxModifier, logValue);
+    }
+
+
+
+
 
     private void checkLooseCondition() {
         boolean collisionDetected = false;
@@ -238,7 +272,7 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void addToScore(int points) {
-        score += points*points*points;
+        score += points * points * points;
         scoreLabel.setText("{FAST}Score: " + score);
         scoreLabel.restart();
     }

@@ -27,6 +27,7 @@ public class AssetLoader implements AssetErrorListener {
     public static Sound hoverOverEnterSound;
     public static Sound clockTickingSound;
     public static Sound gameOverSound;
+    public static Array<Array<Sound>> fartSounds = new Array();
 
     public static Array<Music> music;
     public static Music levelMusic;
@@ -69,6 +70,30 @@ public class AssetLoader implements AssetErrorListener {
         BaseGame.assetManager.load("audio/sound/hoverOverEnter.wav", Sound.class);
         BaseGame.assetManager.load("audio/sound/clock ticking.wav", Sound.class);
         BaseGame.assetManager.load("audio/sound/Game over FIJ Bsw.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/1/Fart.1..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/1/Fart.1.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/2/Fart.2...wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/2/Fart.2..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/2/Fart.2.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/3/Fart.3...wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/3/Fart.3..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/3/Fart.3.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/4/Fart.4...wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/4/Fart.4.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/4/Fart.4.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/5/Fart.5..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/5/Fart.5.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/6/Fart.6..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/6/Fart.6.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/7/Fart.7..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/7/Fart.7.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/8/Fart.8...wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/8/Fart.8..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/8/Fart.8.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/9/Fart.9..wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/9/Fart.9.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/10/Fart.10.wav", Sound.class);
+        BaseGame.assetManager.load("audio/sound/farts/11/Fart.11..wav", Sound.class);
 
         // i18n
 
@@ -103,6 +128,8 @@ public class AssetLoader implements AssetErrorListener {
         clockTickingSound = BaseGame.assetManager.get("audio/sound/clock ticking.wav", Sound.class);
         gameOverSound = BaseGame.assetManager.get("audio/sound/Game over FIJ Bsw.wav", Sound.class);
 
+        loadFartSounds();
+
         // i18n
 
         // shaders
@@ -135,5 +162,67 @@ public class AssetLoader implements AssetErrorListener {
         testMap = BaseGame.assetManager.get("maps/test.tmx", TiledMap.class);
         maps = new Array();
         maps.add(testMap);
+    }
+
+    private static void loadFartSounds() {
+        Array<Sound> temp;
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/1/Fart.1..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/1/Fart.1.wav", Sound.class));
+        fartSounds.add(temp);
+
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/2/Fart.2...wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/2/Fart.2..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/2/Fart.2.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/3/Fart.3...wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/3/Fart.3..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/3/Fart.3.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/4/Fart.4...wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/4/Fart.4.wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/4/Fart.4.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/5/Fart.5..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/5/Fart.5.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/6/Fart.6..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/6/Fart.6.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/7/Fart.7..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/7/Fart.7.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/8/Fart.8...wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/8/Fart.8..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/8/Fart.8.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/9/Fart.9..wav", Sound.class));
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/9/Fart.9.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/10/Fart.10.wav", Sound.class));
+        fartSounds.add(temp);
+
+        temp = new Array<>();
+        temp.add(BaseGame.assetManager.get("audio/sound/farts/11/Fart.11..wav", Sound.class));
+        fartSounds.add(temp);
     }
 }
