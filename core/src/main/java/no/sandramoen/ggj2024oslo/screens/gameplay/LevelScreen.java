@@ -223,7 +223,7 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void addToScore(int points) {
-        score += points*points;
+        score += points*points*points;
         scoreLabel.setText("{FAST}Score: " + score);
         scoreLabel.restart();
     }
