@@ -13,7 +13,7 @@ import com.github.tommyettinger.textra.TypingLabel;
 import box2dLight.Light;
 import box2dLight.PointLight;
 import no.sandramoen.ggj2024oslo.actors.Element;
-import no.sandramoen.ggj2024oslo.actors.map.Background;
+import no.sandramoen.ggj2024oslo.actors.Background;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.screens.shell.MenuScreen;
