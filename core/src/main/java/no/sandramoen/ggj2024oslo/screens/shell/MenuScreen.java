@@ -11,6 +11,7 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.utils.Align;
 
 import no.sandramoen.ggj2024oslo.gui.MadeByLabel;
+import no.sandramoen.ggj2024oslo.screens.gameplay.LevelScreen;
 import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
@@ -136,7 +137,7 @@ public class MenuScreen extends BaseScreen {
     }
 
     private void start() {
-        BaseGame.setActiveScreen(new LevelSelectScreen());
+        BaseGame.setActiveScreen(new LevelScreen(AssetLoader.maps.first()));
     }
 
     private SequenceAction exitGameWithSoundAndDelay() {

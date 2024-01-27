@@ -31,8 +31,6 @@ public class AssetLoader implements AssetErrorListener {
 
     public static Array<TiledMap> maps;
     public static TiledMap testMap;
-    public static TiledMap level1;
-    public static TiledMap level2;
     public static TiledMap currentLevel;
 
     static {
@@ -120,7 +118,8 @@ public class AssetLoader implements AssetErrorListener {
     }
 
     private static void loadFonts() {
-        float scale = Gdx.graphics.getWidth() * .000656f; // magic number ensures scale ~= 1, based on screen width
+        float scale = Gdx.graphics.getHeight() * .000656f; // magic number ensures scale ~= 1, based on screen width
+        // float scale = Gdx.graphics.getWidth() * .000656f; // magic number ensures scale ~= 1, based on screen width
         scale *= 1.01f; // make x percent bigger, bigger = more fuzzy
 
         mySkin.getFont("Play-Bold20white").getData().setScale(scale);
@@ -130,12 +129,7 @@ public class AssetLoader implements AssetErrorListener {
 
     private static void loadTiledMap() {
         testMap = BaseGame.assetManager.get("maps/test.tmx", TiledMap.class);
-        level1 = BaseGame.assetManager.get("maps/level1.tmx", TiledMap.class);
-        level2 = BaseGame.assetManager.get("maps/level2.tmx", TiledMap.class);
-
         maps = new Array();
         maps.add(testMap);
-        maps.add(level1);
-        maps.add(level2);
     }
 }

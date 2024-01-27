@@ -19,7 +19,6 @@ import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.screens.shell.MenuScreen;
 import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
-import no.sandramoen.ggj2024oslo.screens.shell.LevelSelectScreen;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
 import no.sandramoen.ggj2024oslo.utils.GameUtils;
@@ -62,8 +61,6 @@ public class LevelScreen extends BaseScreen {
             Gdx.app.exit();
         } else if (keycode == Keys.R) {
             BaseGame.setActiveScreen(new LevelScreen(currentMap));
-        } else if (keycode == Keys.T) {
-            BaseGame.setActiveScreen(new LevelSelectScreen());
         } else if (keycode == Keys.F1) {
             toggleWorldDebug();
         } else if (keycode == Keys.F2) {
