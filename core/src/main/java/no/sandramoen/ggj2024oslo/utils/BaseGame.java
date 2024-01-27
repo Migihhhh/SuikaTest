@@ -31,17 +31,17 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     public static float vibrationStrength = 1f;
     public static final float UNIT_SCALE = 1 / 16f;
 
-    private final float size0 = 0.3f;
-    private final float size1 = 0.4f;
-    private final float size2 = 0.7f;
-    private final float size3 = 1.1f;
-    private final float size4 = 1.8f;
-    private final float size5 = 2.9f;
-    private final float size6 = 4.7f;
-    private final float size7 = 7.6f;
-    private final float size8 = 12.3f;
-    private final float size9 = 19.9f;
-    private final float size10 = 32.2f;
+    private final float size0 = 0.5f;
+    private final float size1 = 1.0f;
+    private final float size2 = 1.5f;
+    private final float size3 = 2.0f;
+    private final float size4 = 2.5f;
+    private final float size5 = 3.0f;
+    private final float size6 = 3.5f;
+    private final float size7 = 4.0f;
+    private final float size8 = 4.5f;
+    private final float size9 = 5.0f;
+    private final float size10 = 6f;
     public static final Array<Float> sizes = new Array();
 
     public static final short BOX2D_ALL = -1;

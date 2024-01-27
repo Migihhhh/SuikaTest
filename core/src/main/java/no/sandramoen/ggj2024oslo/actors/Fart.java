@@ -93,7 +93,8 @@ public class Fart extends BaseActor {
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 1f;
-        fixtureDef.restitution = .1f;
+        fixtureDef.restitution = .175f;
+        fixtureDef.friction = .075f;
 
         fixtureDef.filter.categoryBits = BaseGame.BOX2D_ONE;
         fixtureDef.filter.maskBits = BaseGame.BOX2D_ALL;

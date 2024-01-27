@@ -30,12 +30,14 @@ import no.sandramoen.ggj2024oslo.utils.MapLoader;
 public class LevelScreen extends BaseScreen {
     private final float newFartDelayDuration = 1f;
     private final float fartSpawnHeight = 15f;
+    private int score;
 
     private Fart droppingFart;
-    private LoseSensor loseSensor;
     private Array<ImpassableTerrain> impassables;
+    private LoseSensor loseSensor;
 
     private TypingLabel gameOverLabel;
+    private TypingLabel scoreLabel;
     private final TiledMapActor tilemap;
     private final TiledMap currentMap;
 
@@ -120,6 +122,7 @@ public class LevelScreen extends BaseScreen {
                 Fart fart = (Fart) actor;
                 if (fart.isRemoving) {
                     if (fart.spawnNewFart != null) {
+                        addToScore(MathUtils.ceil(fart.size));
                         int currentIndex = findIndexOfSize(fart.size);
                         float nextSize = getNextSize(currentIndex);
                         new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
@@ -219,6 +222,12 @@ public class LevelScreen extends BaseScreen {
         droppingFart = new Fart(4.5f, fartSpawnHeight, BaseGame.sizes.first(), mainStage, engine, world);
     }
 
+    private void addToScore(int points) {
+        score += points*points;
+        scoreLabel.setText("{FAST}Score: " + score);
+        scoreLabel.restart();
+    }
+
     private void delayedMapCenterCamera() {
         new BaseActor(0, 0, mainStage).addAction(Actions.run(() -> {
             TiledMapActor.centerPositionCamera(mainStage);
@@ -232,7 +241,11 @@ public class LevelScreen extends BaseScreen {
         gameOverLabel.setAlignment(Align.top);
         gameOverLabel.setVisible(false);
 
+        scoreLabel = new TypingLabel("{FAST}Score:", AssetLoader.getLabelStyle("Play-Bold59white"));
+        scoreLabel.setAlignment(Align.top);
+
         uiTable.defaults().padTop(Gdx.graphics.getHeight() * .02f);
+        uiTable.add(scoreLabel).expandY().top().row();
         uiTable.add(gameOverLabel).height(gameOverLabel.getPrefHeight() * 1.5f).expandY().top().row();
         // uiTable.setDebug(true);
     }
