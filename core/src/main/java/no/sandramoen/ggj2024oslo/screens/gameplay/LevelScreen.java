@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -28,14 +29,18 @@ import no.sandramoen.ggj2024oslo.utils.MapLoader;
 
 public class LevelScreen extends BaseScreen {
     private final float newFartDelayDuration = 2f;
+    private final float fartSpawnHeight = 15f;
 
     private Fart droppingFart;
     private LoseSensor loseSensor;
     private Array<ImpassableTerrain> impassables;
 
-    private TypingLabel topLabel;
+    private TypingLabel gameOverLabel;
     private final TiledMapActor tilemap;
     private final TiledMap currentMap;
+
+    private float countDown = 0f;
+    private final float countDownTo = 3f;
 
     public LevelScreen(TiledMap tiledMap) {
         super(tiledMap);
@@ -55,8 +60,18 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float delta) {
+        if (gameOverLabel.isVisible())
+            return;
+
         if (droppingFart != null)
             droppingFart.suspend();
+
+        checkMergeFarts();
+
+        if (countDown == 0f)
+            checkLooseCondition();
+        else
+            countDownToLoose(delta);
     }
 
     @Override
@@ -97,8 +112,71 @@ public class LevelScreen extends BaseScreen {
         return super.touchDown(screenX, screenY, pointer, button);
     }
 
+    private void checkMergeFarts() {
+        for (Actor actor : mainStage.getActors()) {
+            if (actor instanceof Fart) {
+                Fart fart = (Fart) actor;
+                if (fart.isRemoving) {
+                    if (fart.spawnNewFart != null) {
+                        int currentIndex = findIndexOfSize(fart.size);
+                        float nextSize = getNextSize(currentIndex);
+                        new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
+                    }
+                    fart.remove();
+                }
+            }
+        }
+    }
+
+    private int findIndexOfSize(float size) {
+        for (int i = 0; i < BaseGame.sizes.size; i++) {
+            if (BaseGame.sizes.get(i) == size) {
+                return i;
+            }
+        }
+        return -1; // Size not found in the array
+    }
+
+    private float getNextSize(int currentIndex) {
+        int nextIndex = currentIndex + 1;
+        if (nextIndex < BaseGame.sizes.size) {
+            return BaseGame.sizes.get(nextIndex);
+        } else {
+            // Return the last size if there is no next size
+            return BaseGame.sizes.get(BaseGame.sizes.size - 1);
+        }
+    }
+
+    private void checkLooseCondition() {
+        countDown = 0f;
+        for (Actor actor : mainStage.getActors()) {
+            if (actor instanceof Fart) {
+                Fart fart = (Fart) actor;
+                if (fart.isSensor && fart != droppingFart) {
+                    countDown = .01f;
+                    break;
+                }
+            }
+        }
+    }
+
+    private void countDownToLoose(float delta) {
+        countDown += delta;
+        if (countDown > countDownTo)
+            gameOverLabel.setVisible(true);
+    }
+
     private void createNewFartToDrop() {
-        droppingFart = new Fart(4.5f, 15f, BaseGame.sizes.get(MathUtils.random(0, 4)), mainStage, engine, world);
+        droppingFart = new Fart(
+            getMouseXInWorld(),
+            fartSpawnHeight,
+            BaseGame.sizes.get(MathUtils.random(0, 4)),
+            mainStage, engine, world
+        );
+    }
+
+    private float getMouseXInWorld() {
+        return mainStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), 0f)).x;
     }
 
     private void initializeLights() {
@@ -127,7 +205,7 @@ public class LevelScreen extends BaseScreen {
 
     private void loadActorsFromMap() {
         new MapLoader(mainStage, engine, world, tilemap, impassables, loseSensor);
-        droppingFart = new Fart(4.5f, 15f, BaseGame.sizes.first(), mainStage, engine, world);
+        droppingFart = new Fart(4.5f, fartSpawnHeight, BaseGame.sizes.first(), mainStage, engine, world);
     }
 
     private void delayedMapCenterCamera() {
@@ -139,11 +217,12 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeGUI() {
-        topLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
-        topLabel.setAlignment(Align.top);
+        gameOverLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
+        gameOverLabel.setAlignment(Align.top);
+        gameOverLabel.setVisible(false);
 
         uiTable.defaults().padTop(Gdx.graphics.getHeight() * .02f);
-        uiTable.add(topLabel).height(topLabel.getPrefHeight() * 1.5f).expandY().top().row();
+        uiTable.add(gameOverLabel).height(gameOverLabel.getPrefHeight() * 1.5f).expandY().top().row();
         // uiTable.setDebug(true);
     }
 }

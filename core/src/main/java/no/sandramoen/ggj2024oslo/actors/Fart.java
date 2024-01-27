@@ -19,9 +19,39 @@ import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class Fart extends BaseActor {
     public Body body;
-    public boolean isDead;
+    public boolean isRemoving;
+    public boolean isSensor;
+    public Vector2 spawnNewFart;
+    public float size;
+    public enum Type {RED, YELLOW, BLUE}
+    public Engine engine;
+    public World world;
 
     private Vector2 tempPosition;
+
+    public Fart(float x, float y, float size, Stage stage, Engine engine, World world) {
+        super(x, y, stage, engine);
+        this.engine = engine;
+        this.world = world;
+
+        tempPosition = new Vector2(x, y);
+
+        loadImage("fart");
+        this.size = size;
+        setSize(size, size);
+
+        body = createBody(world);
+        entity.add(new BodyComponent(body));
+        entity.add(new PlayerControlComponent());
+        engine.addEntity(entity);
+    }
+
+    @Override
+    public boolean remove() {
+        body.setTransform(1_000f, 1_000f, 0f);
+        body.setActive(false);
+        return super.remove();
+    }
 
     public void setPosition(Vector2 vector2) {
         tempPosition = vector2;
@@ -34,22 +64,7 @@ public class Fart extends BaseActor {
         body.setLinearVelocity(0, 0);
     }
 
-    public enum Type {RED, YELLOW, BLUE}
-
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
-
-    public Fart(float x, float y, float size, Stage stage, Engine engine, World world) {
-        super(x, y, stage, engine);
-        tempPosition = new Vector2(x, y);
-
-        loadImage("fart");
-        setSize(size, size);
-
-        body = createBody(world);
-        entity.add(new BodyComponent(body));
-        entity.add(new PlayerControlComponent());
-        engine.addEntity(entity);
-    }
 
     private void shakeCamera(float duration) {
         isShakyCam = true;
