@@ -22,7 +22,7 @@ class Lwjgl3Launcher {
         if (isFullscreen)
             config.setFullscreenMode(Lwjgl3ApplicationConfiguration.getDisplayMode());
         else
-            setWindowedMode(.6f, config);
+            setWindowedMode(.25f, config);
 
         new Lwjgl3Application(new MyGdxGame(), config);
     }
@@ -37,7 +37,7 @@ class Lwjgl3Launcher {
         Graphics.DisplayMode dimension = Lwjgl3ApplicationConfiguration.getDisplayMode();
         int width = (int) (dimension.width * percentOfScreenSize);
 
-        float aspectRatio = 16 / 9f;
+        float aspectRatio = 9 / 16f;
         int height = (int) (width / aspectRatio);
 
         System.out.println("[DesktopLauncher] Window dimensions => width: " + width + ", height: " + height);
