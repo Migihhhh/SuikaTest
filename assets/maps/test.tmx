@@ -38,11 +38,6 @@
   </data>
  </layer>
  <objectgroup id="2" name="actors">
-  <object id="5" gid="1" x="48" y="48" width="32" height="32">
-   <properties>
-    <property name="name" value="banana"/>
-   </properties>
-  </object>
   <object id="22" gid="9" x="-14" y="240" width="16" height="240"/>
   <object id="23" gid="9" x="0" y="256" width="144" height="16"/>
   <object id="25" gid="9" x="142" y="240" width="16" height="240"/>

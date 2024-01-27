@@ -5,6 +5,8 @@ import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
@@ -22,18 +24,18 @@ import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
-import no.sandramoen.ggj2024oslo.utils.GameUtils;
 import no.sandramoen.ggj2024oslo.utils.MapLoader;
 
 public class LevelScreen extends BaseScreen {
-    private TiledMap currentMap;
+    private final float newFartDelayDuration = 2f;
 
-    private Fart player;
+    private Fart droppingFart;
     private LoseSensor loseSensor;
     private Array<ImpassableTerrain> impassables;
 
     private TypingLabel topLabel;
     private final TiledMapActor tilemap;
+    private final TiledMap currentMap;
 
     public LevelScreen(TiledMap tiledMap) {
         super(tiledMap);
@@ -53,7 +55,17 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float delta) {
+        if (droppingFart != null)
+            droppingFart.suspend();
+    }
 
+    @Override
+    public boolean mouseMoved(int screenX, int screenY) {
+        Vector2 worldCoordinates = mainStage.screenToStageCoordinates(new Vector2(screenX, screenY));
+        if (droppingFart != null) {
+            droppingFart.setPosition(new Vector2(worldCoordinates.x, 15f));
+        }
+        return super.mouseMoved(screenX, screenY);
     }
 
     @Override
@@ -74,8 +86,19 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
-        GameUtils.printMousePosition(screenX, screenY, mainStage);
+        // GameUtils.printMousePosition(screenX, screenY, mainStage);
+        if (droppingFart != null) {
+            droppingFart = null;
+            new BaseActor(0f, 0f, mainStage).addAction(Actions.sequence(
+                Actions.delay(newFartDelayDuration),
+                Actions.run(() -> createNewFartToDrop())
+            ));
+        }
         return super.touchDown(screenX, screenY, pointer, button);
+    }
+
+    private void createNewFartToDrop() {
+        droppingFart = new Fart(4.5f, 15f, BaseGame.sizes.get(MathUtils.random(0, 4)), mainStage, engine, world);
     }
 
     private void initializeLights() {
@@ -86,9 +109,9 @@ public class LevelScreen extends BaseScreen {
 
     private void initializeAmbientLight() {
         Light.setGlobalContactFilter(
-            BaseGame.BOX2D_ONE,
             BaseGame.BOX2D_ALL,
-            BaseGame.BOX2D_TWO
+            BaseGame.BOX2D_ALL,
+            BaseGame.BOX2D_ALL
         );
         float amount = 0.05f;
         rayHandler.setAmbientLight(amount, amount, amount, 1f);
@@ -103,8 +126,8 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void loadActorsFromMap() {
-        MapLoader mapLoader = new MapLoader(mainStage, engine, world, tilemap, player, impassables, loseSensor);
-        player = mapLoader.player;
+        new MapLoader(mainStage, engine, world, tilemap, impassables, loseSensor);
+        droppingFart = new Fart(4.5f, 15f, BaseGame.sizes.first(), mainStage, engine, world);
     }
 
     private void delayedMapCenterCamera() {

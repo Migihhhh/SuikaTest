@@ -1,5 +1,6 @@
 package no.sandramoen.ggj2024oslo.utils;
 
+import com.badlogic.ashley.core.ComponentMapper;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputMultiplexer;
@@ -7,6 +8,7 @@ import com.badlogic.gdx.Preferences;
 import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
+import com.badlogic.gdx.utils.Array;
 
 import no.sandramoen.ggj2024oslo.screens.gameplay.LevelScreen;
 
@@ -29,6 +31,19 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     public static float vibrationStrength = 1f;
     public static final float UNIT_SCALE = 1 / 16f;
 
+    private final float size0 = 0.3f;
+    private final float size1 = 0.4f;
+    private final float size2 = 0.7f;
+    private final float size3 = 1.1f;
+    private final float size4 = 1.8f;
+    private final float size5 = 2.9f;
+    private final float size6 = 4.7f;
+    private final float size7 = 7.6f;
+    private final float size8 = 12.3f;
+    private final float size9 = 19.9f;
+    private final float size10 = 32.2f;
+    public static final Array<Float> sizes = new Array();
+
     public static final short BOX2D_ALL = -1;
     public static final short BOX2D_NONE = 0;
     public static final short BOX2D_ONE = 2;
@@ -42,6 +57,18 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
         Gdx.input.setInputProcessor(new InputMultiplexer());
         loadGameState();
         new AssetLoader();
+
+        sizes.add(size0);
+        sizes.add(size1);
+        sizes.add(size2);
+        sizes.add(size3);
+        sizes.add(size4);
+        sizes.add(size5);
+        sizes.add(size6);
+        sizes.add(size7);
+        sizes.add(size8);
+        sizes.add(size9);
+        sizes.add(size10);
     }
 
     public static void setActiveScreen(BaseScreen screen) {

@@ -18,18 +18,34 @@ import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
 public class Fart extends BaseActor {
+    public Body body;
     public boolean isDead;
+
+    private Vector2 tempPosition;
+
+    public void setPosition(Vector2 vector2) {
+        tempPosition = vector2;
+        body.setTransform(vector2, 0f);
+        body.setLinearVelocity(0, 0);
+    }
+
+    public void suspend() {
+        body.setTransform(tempPosition, 0f);
+        body.setLinearVelocity(0, 0);
+    }
+
     public enum Type {RED, YELLOW, BLUE}
 
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
-    public Fart(float x, float y, Stage stage, Engine engine, World world) {
+    public Fart(float x, float y, float size, Stage stage, Engine engine, World world) {
         super(x, y, stage, engine);
+        tempPosition = new Vector2(x, y);
 
-        loadImage("whitePixel");
-        setSize(.35f, .35f);
+        loadImage("fart");
+        setSize(size, size);
 
-        Body body = createBody(world);
+        body = createBody(world);
         entity.add(new BodyComponent(body));
         entity.add(new PlayerControlComponent());
         engine.addEntity(entity);

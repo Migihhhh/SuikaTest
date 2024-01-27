@@ -14,7 +14,6 @@ import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 
 public class MapLoader {
-    public Fart player;
     public LoseSensor loseSensor;
     public Array<ImpassableTerrain> impassables;
 
@@ -24,17 +23,16 @@ public class MapLoader {
     private final World world;
 
     public MapLoader(Stage mainStage, Engine engine, World world, TiledMapActor tilemap,
-                     Fart player, Array<ImpassableTerrain> impassables, LoseSensor loseSensor) {
+                     Array<ImpassableTerrain> impassables, LoseSensor loseSensor) {
         this.tilemap = tilemap;
         this.mainStage = mainStage;
         this.engine = engine;
         this.world = world;
 
-        this.player = player;
         this.impassables = impassables;
         this.loseSensor = loseSensor;
 
-        initializeActor("player");
+        // initializeActor("player");
         initializeActors("impassable");
         initializeActors("loseSensor");
     }
@@ -62,18 +60,18 @@ public class MapLoader {
         }
     }
 
-    private void initializeActor(String propertyName) {
+    /*private void initializeActor(String propertyName) {
         String layerName = "actors";
         if (tilemap.getTileList(layerName, propertyName).size() == 1) {
             MapObject mapObject = tilemap.getTileList(layerName, propertyName).get(0);
             float x = mapObject.getProperties().get("x", Float.class) * BaseGame.UNIT_SCALE;
             float y = mapObject.getProperties().get("y", Float.class) * BaseGame.UNIT_SCALE;
-            player = new Fart(x, y, mainStage, engine, world);
+            droppingFart = new Fart(x, y, mainStage, engine, world);
         } else if (tilemap.getTileList(layerName, propertyName).size() > 1) {
             Gdx.app.error(getClass().getSimpleName(), "Error => found more than one property: " + propertyName + " on layer: " + layerName + "!");
         } else {
             Gdx.app.error(getClass().getSimpleName(), "Error => found no property: " + propertyName + " on layer: " + layerName + "!");
-            player = null;
+            droppingFart = null;
         }
-    }
+    }*/
 }
