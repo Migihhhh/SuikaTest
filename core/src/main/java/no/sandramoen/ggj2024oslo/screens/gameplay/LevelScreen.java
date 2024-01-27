@@ -28,7 +28,7 @@ import no.sandramoen.ggj2024oslo.utils.BaseScreen;
 import no.sandramoen.ggj2024oslo.utils.MapLoader;
 
 public class LevelScreen extends BaseScreen {
-    private final float newFartDelayDuration = 2f;
+    private final float newFartDelayDuration = 1f;
     private final float fartSpawnHeight = 15f;
 
     private Fart droppingFart;
@@ -40,6 +40,7 @@ public class LevelScreen extends BaseScreen {
     private final TiledMap currentMap;
 
     private float countDown = 0f;
+    private boolean isCountDown;
     private final float countDownTo = 3f;
 
     public LevelScreen(TiledMap tiledMap) {
@@ -60,18 +61,18 @@ public class LevelScreen extends BaseScreen {
 
     @Override
     public void update(float delta) {
-        if (gameOverLabel.isVisible())
-            return;
-
         if (droppingFart != null)
             droppingFart.suspend();
 
+        if (gameOverLabel.isVisible())
+            return;
+
         checkMergeFarts();
 
-        if (countDown == 0f)
-            checkLooseCondition();
-        else
+        checkLooseCondition();
+        if (isCountDown) {
             countDownToLoose(delta);
+        }
     }
 
     @Override
@@ -102,7 +103,8 @@ public class LevelScreen extends BaseScreen {
     @Override
     public boolean touchDown(int screenX, int screenY, int pointer, int button) {
         // GameUtils.printMousePosition(screenX, screenY, mainStage);
-        if (droppingFart != null) {
+
+        if (droppingFart != null && !gameOverLabel.isVisible()) {
             droppingFart = null;
             new BaseActor(0f, 0f, mainStage).addAction(Actions.sequence(
                 Actions.delay(newFartDelayDuration),
@@ -148,15 +150,24 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void checkLooseCondition() {
-        countDown = 0f;
+        boolean collisionDetected = false;
+
         for (Actor actor : mainStage.getActors()) {
             if (actor instanceof Fart) {
                 Fart fart = (Fart) actor;
                 if (fart.isSensor && fart != droppingFart) {
-                    countDown = .01f;
+                    collisionDetected = true;
                     break;
                 }
             }
+        }
+
+        // Set countDown based on the collisionDetected flag
+        if (collisionDetected) {
+            isCountDown = true;
+        } else {
+            isCountDown = false;
+            countDown = 0f; // Reset countDown if there are no collisions
         }
     }
 

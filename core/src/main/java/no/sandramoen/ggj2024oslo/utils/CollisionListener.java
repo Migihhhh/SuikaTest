@@ -23,7 +23,15 @@ public class CollisionListener implements ContactListener {
 
     @Override
     public void endContact(Contact contact) {
-
+        String entityA = contact.getFixtureA().getUserData().toString();
+        String entityB = contact.getFixtureB().getUserData().toString();
+        if (entityA == "fart" && entityB == "loseSensor") {
+            Fart fart = (Fart) contact.getFixtureA().getBody().getUserData();
+            fart.isSensor = false;
+        } else if (entityA == "loseSensor" && entityB == "fart") {
+            Fart fart = (Fart) contact.getFixtureB().getBody().getUserData();
+            fart.isSensor = false;
+        }
     }
 
     @Override
