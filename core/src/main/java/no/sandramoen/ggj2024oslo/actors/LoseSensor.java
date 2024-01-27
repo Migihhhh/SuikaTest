@@ -48,8 +48,6 @@ public class LoseSensor extends BaseActor {
         if (!hasActions())
             return;
 
-        System.out.println("banana");
-
         clearActions();
         addAction(Actions.alpha(0f, .5f));
     }

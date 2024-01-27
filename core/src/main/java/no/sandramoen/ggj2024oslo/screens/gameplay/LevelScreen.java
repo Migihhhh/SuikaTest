@@ -15,11 +15,12 @@ import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tommyettinger.textra.TypingLabel;
 
+import java.util.Iterator;
+
 import box2dLight.Light;
-import box2dLight.PointLight;
+import no.sandramoen.ggj2024oslo.FartLight;
 import no.sandramoen.ggj2024oslo.actors.Fart;
 import no.sandramoen.ggj2024oslo.actors.Background;
-import no.sandramoen.ggj2024oslo.actors.LoseSensor;
 import no.sandramoen.ggj2024oslo.actors.map.ImpassableTerrain;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.screens.shell.MenuScreen;
@@ -50,6 +51,8 @@ public class LevelScreen extends BaseScreen {
     private long tickingSoundID;
     private final float countDownTo = 4f;
 
+    private Array<FartLight> fartLights = new Array();
+
     public LevelScreen(TiledMap tiledMap) {
         super(tiledMap);
         currentMap = tiledMap;
@@ -63,7 +66,7 @@ public class LevelScreen extends BaseScreen {
         initializeGUI();
         delayedMapCenterCamera();
 
-        AssetLoader.fartSounds.get(0).get(0).play(1f); // sound hack
+        AssetLoader.fartSounds.get(0).get(0).play(0f); // sound hack
     }
 
     @Override
@@ -84,6 +87,8 @@ public class LevelScreen extends BaseScreen {
         if (isCountDown) {
             countDownToLoose(delta);
         }
+
+        handleFartLights(delta);
     }
 
     @Override
@@ -130,17 +135,25 @@ public class LevelScreen extends BaseScreen {
             if (actor instanceof Fart) {
                 Fart fart = (Fart) actor;
                 if (fart.isRemoving) {
-                    if (fart.spawnNewFart != null) {
-                        addToScore(MathUtils.ceil(fart.size));
-                        int currentIndex = findIndexOfSize(fart.size);
-                        float nextSize = getNextSize(currentIndex);
-                        playFartSound(currentIndex);
-                        new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
-                    }
+                    if (fart.spawnNewFart != null)
+                        mergeFarts(fart);
                     fart.remove();
                 }
             }
         }
+    }
+
+    private void mergeFarts(Fart fart) {
+        addToScore(MathUtils.ceil(fart.size));
+        int currentIndex = findIndexOfSize(fart.size);
+        float nextSize = getNextSize(currentIndex);
+        playFartSound(currentIndex);
+
+        Fart newFart = new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
+        fartLights.add(new FartLight(newFart, rayHandler, 2048, Color.GOLD, nextSize*2,
+            fart.getX() + nextSize / 2,
+            fart.getY() + nextSize / 2
+        ));
     }
 
     private int findIndexOfSize(float size) {
@@ -173,7 +186,7 @@ public class LevelScreen extends BaseScreen {
 
         for (int i = 0; i <= 10; i++) {
             float modifier = calculateLogarithmicModifier(i, minModifier, maxModifier);
-            System.out.println("Level " + i + ": m = " + modifier);
+            // System.out.println("Level " + i + ": m = " + modifier);
         }
 
         float modifier = calculateLogarithmicModifier(currentIndex, minModifier, maxModifier);
@@ -187,10 +200,6 @@ public class LevelScreen extends BaseScreen {
         float logValue = (float) Math.log(currentIndex + 1) / (float) Math.log(logBase);
         return MathUtils.lerp(minModifier, maxModifier, logValue);
     }
-
-
-
-
 
     private void checkLooseCondition() {
         boolean collisionDetected = false;
@@ -243,9 +252,19 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeLights() {
-        new PointLight(rayHandler, 2048, Color.MAGENTA, 10, 3, 2);
-        new PointLight(rayHandler, 2048, Color.GREEN, 10, 11, 5);
         initializeAmbientLight();
+    }
+
+    private void handleFartLights(float delta) {
+        Iterator<FartLight> iterator = fartLights.iterator();
+        while (iterator.hasNext()) {
+            FartLight fartLight = iterator.next();
+            if (fartLight.isRemove) {
+                iterator.remove();
+            } else {
+                fartLight.act(delta);
+            }
+        }
     }
 
     private void initializeAmbientLight() {
@@ -273,7 +292,7 @@ public class LevelScreen extends BaseScreen {
 
     private void addToScore(int points) {
         score += points * points * points;
-        scoreLabel.setText("{FAST}Score: " + score);
+        scoreLabel.setText("{COLOR=#000000}{FAST}Score: " + score);
         scoreLabel.restart();
     }
 
@@ -299,14 +318,14 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeGUI() {
-        gameOverLabel = new TypingLabel("{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
+        gameOverLabel = new TypingLabel("{COLOR=#000000}{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
         gameOverLabel.setAlignment(Align.top);
         gameOverLabel.setVisible(false);
 
-        scoreLabel = new TypingLabel("{FAST}Score: 0", AssetLoader.getLabelStyle("Play-Bold59white"));
+        scoreLabel = new TypingLabel("{COLOR=#000000}{FAST}Score: 0", AssetLoader.getLabelStyle("Play-Bold59white"));
         scoreLabel.setAlignment(Align.top);
 
-        restartLabel = new TypingLabel("{SLOWER}press 'r' to restart", AssetLoader.getLabelStyle("Play-Bold40white"));
+        restartLabel = new TypingLabel("{COLOR=#000000}{SLOWER}press 'r' to restart", AssetLoader.getLabelStyle("Play-Bold40white"));
         restartLabel.setAlignment(Align.top);
         restartLabel.setVisible(false);
 
