@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.utils.Align;
 
 import no.sandramoen.ggj2024oslo.actors.components.BodyComponent;
 import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
@@ -36,9 +37,10 @@ public class Fart extends BaseActor {
 
         tempPosition = new Vector2(x, y);
 
-        loadImage("fart");
+        loadImage("farts/fart1");
         this.size = size;
         setSize(size, size);
+        setOrigin(Align.center);
 
         body = createBody(world);
         entity.add(new BodyComponent(body));
@@ -84,7 +86,6 @@ public class Fart extends BaseActor {
         bodyDef.position.y = (getY() + getHeight() / 2) + bodyOffset.y;
 
         Body body = world.createBody(bodyDef);
-        body.setFixedRotation(true);
         body.setUserData(this);
 
         CircleShape circle = new CircleShape();

@@ -4,6 +4,7 @@
 
 ## LibGDX
 /packr build files/
+/assets/images/included/packed/
 
 ## Gradle:
 .gradle/
