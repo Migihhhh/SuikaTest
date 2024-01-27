@@ -10,6 +10,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.actions.Actions;
 
 import no.sandramoen.ggj2024oslo.actors.components.BodyComponent;
 import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
@@ -31,6 +32,21 @@ public class LoseSensor extends BaseActor {
         entity.add(new BodyComponent(body));
         entity.add(new PlayerControlComponent());
         engine.addEntity(entity);
+    }
+
+    public void startCountDown() {
+        if (hasActions())
+            return;
+
+        addAction(Actions.forever(Actions.sequence(
+            Actions.alpha(.5f, .25f),
+            Actions.alpha(1f, .25f)
+        )));
+    }
+
+    public void stopCountDown() {
+        clearActions();
+        addAction(Actions.alpha(1f, .5f));
     }
 
     private Body createBody(World world) {

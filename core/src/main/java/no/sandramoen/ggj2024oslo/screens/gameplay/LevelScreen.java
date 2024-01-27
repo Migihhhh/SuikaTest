@@ -25,16 +25,16 @@ import no.sandramoen.ggj2024oslo.utils.AssetLoader;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 import no.sandramoen.ggj2024oslo.utils.BaseScreen;
+import no.sandramoen.ggj2024oslo.utils.GameUtils;
 import no.sandramoen.ggj2024oslo.utils.MapLoader;
 
 public class LevelScreen extends BaseScreen {
     private final float newFartDelayDuration = 1f;
-    private final float fartSpawnHeight = 15f;
+    private final float fartSpawnHeight = 14.4f;
     private int score;
 
     private Fart droppingFart;
     private Array<ImpassableTerrain> impassables;
-    private LoseSensor loseSensor;
 
     private TypingLabel gameOverLabel;
     private TypingLabel scoreLabel;
@@ -43,6 +43,8 @@ public class LevelScreen extends BaseScreen {
 
     private float countDown = 0f;
     private boolean isCountDown;
+    private boolean isClockTicking;
+    private long tickingSoundID;
     private final float countDownTo = 3f;
 
     public LevelScreen(TiledMap tiledMap) {
@@ -50,6 +52,8 @@ public class LevelScreen extends BaseScreen {
         currentMap = tiledMap;
         this.tilemap = new TiledMapActor(currentMap, mainStage);
         isBox2d = true;
+
+        GameUtils.playLoopingMusic(AssetLoader.levelMusic);
 
         initializeLights();
         initializeActors();
@@ -66,10 +70,10 @@ public class LevelScreen extends BaseScreen {
         if (droppingFart != null)
             droppingFart.suspend();
 
+        checkMergeFarts();
+
         if (gameOverLabel.isVisible())
             return;
-
-        checkMergeFarts();
 
         checkLooseCondition();
         if (isCountDown) {
@@ -81,7 +85,7 @@ public class LevelScreen extends BaseScreen {
     public boolean mouseMoved(int screenX, int screenY) {
         Vector2 worldCoordinates = mainStage.screenToStageCoordinates(new Vector2(screenX, screenY));
         if (droppingFart != null) {
-            droppingFart.setPosition(new Vector2(worldCoordinates.x, 15f));
+            droppingFart.setPosition(new Vector2(worldCoordinates.x, fartSpawnHeight));
         }
         return super.mouseMoved(screenX, screenY);
     }
@@ -167,9 +171,18 @@ public class LevelScreen extends BaseScreen {
 
         // Set countDown based on the collisionDetected flag
         if (collisionDetected) {
+            // System.out.println(isCountDown + ", " + !isClockTicking + ", " + (isCountDown && !isClockTicking));
+            if (isCountDown && !isClockTicking) {
+                tickingSoundID = AssetLoader.clockTickingSound.play(BaseGame.soundVolume);
+                isClockTicking = true;
+            }
+            BaseGame.loseSensor.startCountDown();
             isCountDown = true;
         } else {
+            BaseGame.loseSensor.stopCountDown();
+            AssetLoader.clockTickingSound.stop(tickingSoundID);
             isCountDown = false;
+            isClockTicking = false;
             countDown = 0f; // Reset countDown if there are no collisions
         }
     }
@@ -177,7 +190,7 @@ public class LevelScreen extends BaseScreen {
     private void countDownToLoose(float delta) {
         countDown += delta;
         if (countDown > countDownTo)
-            gameOverLabel.setVisible(true);
+            setGameOver();
     }
 
     private void createNewFartToDrop() {
@@ -218,7 +231,7 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void loadActorsFromMap() {
-        new MapLoader(mainStage, engine, world, tilemap, impassables, loseSensor);
+        new MapLoader(mainStage, engine, world, tilemap, impassables);
         droppingFart = new Fart(4.5f, fartSpawnHeight, BaseGame.sizes.first(), mainStage, engine, world);
     }
 
@@ -226,6 +239,13 @@ public class LevelScreen extends BaseScreen {
         score += points*points*points;
         scoreLabel.setText("{FAST}Score: " + score);
         scoreLabel.restart();
+    }
+
+    private void setGameOver() {
+        if (droppingFart != null)
+            droppingFart.remove();
+        gameOverLabel.setVisible(true);
+        AssetLoader.clockTickingSound.stop(tickingSoundID);
     }
 
     private void delayedMapCenterCamera() {

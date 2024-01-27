@@ -23,14 +23,13 @@ public class MapLoader {
     private final World world;
 
     public MapLoader(Stage mainStage, Engine engine, World world, TiledMapActor tilemap,
-                     Array<ImpassableTerrain> impassables, LoseSensor loseSensor) {
+                     Array<ImpassableTerrain> impassables) {
         this.tilemap = tilemap;
         this.mainStage = mainStage;
         this.engine = engine;
         this.world = world;
 
         this.impassables = impassables;
-        this.loseSensor = loseSensor;
 
         // initializeActor("player");
         initializeActors("impassable");
@@ -55,7 +54,7 @@ public class MapLoader {
                 ImpassableTerrain impassable = new ImpassableTerrain(x, y, width, height, mainStage, engine, world);
                 impassables.add(impassable);
             } else if (actualPropertyName.equals("loseSensor")) {
-                loseSensor = new LoseSensor(x, y, width, height, mainStage, engine, world);
+                BaseGame.loseSensor = new LoseSensor(x, y, width, height, mainStage, engine, world);
             }
         }
     }

@@ -10,6 +10,7 @@ import com.badlogic.gdx.assets.AssetErrorListener;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.utils.Array;
 
+import no.sandramoen.ggj2024oslo.actors.LoseSensor;
 import no.sandramoen.ggj2024oslo.screens.gameplay.LevelScreen;
 
 public abstract class BaseGame extends Game implements AssetErrorListener {
@@ -43,6 +44,8 @@ public abstract class BaseGame extends Game implements AssetErrorListener {
     private final float size9 = 5.0f;
     private final float size10 = 6f;
     public static final Array<Float> sizes = new Array();
+
+    public static LoseSensor loseSensor;
 
     public static final short BOX2D_ALL = -1;
     public static final short BOX2D_NONE = 0;
