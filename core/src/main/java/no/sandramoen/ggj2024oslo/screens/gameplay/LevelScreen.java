@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.Array;
 import com.github.tommyettinger.textra.TypingLabel;
@@ -37,6 +38,7 @@ public class LevelScreen extends BaseScreen {
     private Array<ImpassableTerrain> impassables;
 
     private TypingLabel gameOverLabel;
+    private TypingLabel restartLabel;
     private TypingLabel scoreLabel;
     private final TiledMapActor tilemap;
     private final TiledMap currentMap;
@@ -45,7 +47,7 @@ public class LevelScreen extends BaseScreen {
     private boolean isCountDown;
     private boolean isClockTicking;
     private long tickingSoundID;
-    private final float countDownTo = 3f;
+    private final float countDownTo = 4f;
 
     public LevelScreen(TiledMap tiledMap) {
         super(tiledMap);
@@ -245,6 +247,9 @@ public class LevelScreen extends BaseScreen {
         if (droppingFart != null)
             droppingFart.remove();
         gameOverLabel.setVisible(true);
+        gameOverLabel.restart();
+        restartLabel.setVisible(true);
+        restartLabel.restart();
         AssetLoader.clockTickingSound.stop(tickingSoundID);
     }
 
@@ -261,12 +266,32 @@ public class LevelScreen extends BaseScreen {
         gameOverLabel.setAlignment(Align.top);
         gameOverLabel.setVisible(false);
 
-        scoreLabel = new TypingLabel("{FAST}Score:", AssetLoader.getLabelStyle("Play-Bold59white"));
+        scoreLabel = new TypingLabel("{FAST}Score: 0", AssetLoader.getLabelStyle("Play-Bold59white"));
         scoreLabel.setAlignment(Align.top);
 
-        uiTable.defaults().padTop(Gdx.graphics.getHeight() * .02f);
-        uiTable.add(scoreLabel).expandY().top().row();
-        uiTable.add(gameOverLabel).height(gameOverLabel.getPrefHeight() * 1.5f).expandY().top().row();
+        restartLabel = new TypingLabel("{SLOWER}press 'r' to restart", AssetLoader.getLabelStyle("Play-Bold40white"));
+        restartLabel.setAlignment(Align.top);
+        restartLabel.setVisible(false);
+
+        Table gameOverTable = new Table();
+        gameOverTable.add(gameOverLabel)
+            .padBottom(Gdx.graphics.getHeight() * .02f)
+            .row();
+        gameOverTable.add(restartLabel);
+
+        uiTable.defaults()
+            .padTop(Gdx.graphics.getHeight() * .02f);
+        uiTable.add(scoreLabel)
+            .expandY()
+            .top()
+            .row();
+        uiTable.add(gameOverTable)
+            .height(gameOverLabel
+                .getPrefHeight() * 1.5f)
+            .expandY()
+            .top()
+            .padBottom(Gdx.graphics.getHeight() * .18f)
+            .row();
         // uiTable.setDebug(true);
     }
 }

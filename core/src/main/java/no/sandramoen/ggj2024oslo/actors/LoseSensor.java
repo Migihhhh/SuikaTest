@@ -25,7 +25,7 @@ public class LoseSensor extends BaseActor {
 
         loadImage("whitePixel");
         setColor(Color.CYAN);
-        getColor().a = .25f;
+        getColor().a = 0f;
         setSize(width, height);
 
         Body body = createBody(world);
@@ -39,14 +39,14 @@ public class LoseSensor extends BaseActor {
             return;
 
         addAction(Actions.forever(Actions.sequence(
-            Actions.alpha(.5f, .25f),
-            Actions.alpha(1f, .25f)
+            Actions.alpha(.25f, .5f),
+            Actions.alpha(0f, .5f)
         )));
     }
 
     public void stopCountDown() {
         clearActions();
-        addAction(Actions.alpha(1f, .5f));
+        addAction(Actions.alpha(0f, .5f));
     }
 
     private Body createBody(World world) {
