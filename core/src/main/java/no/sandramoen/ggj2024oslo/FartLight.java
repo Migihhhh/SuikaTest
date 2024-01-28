@@ -53,7 +53,7 @@ public class FartLight extends PointLight {
             // Ensure fadingDistance reaches zero before the end of lifeTime
             fadingDistance = Math.max(0.0f, originalDistance - (elapsedTime - lifeTime / 2) * 10.0f);
 
-            System.out.println("original: " + originalDistance + ", fading: " + fadingDistance + ", life time: " + lifeTime + ", diff: " + (lifeTime - elapsedTime));
+            // System.out.println("original: " + originalDistance + ", fading: " + fadingDistance + ", life time: " + lifeTime + ", diff: " + (lifeTime - elapsedTime));
         }
 
         setDistance(fadingDistance);

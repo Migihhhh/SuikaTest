@@ -24,7 +24,9 @@ public class Fart extends BaseActor {
     public boolean isSensor;
     public Vector2 spawnNewFart;
     public float size;
+
     public enum Type {RED, YELLOW, BLUE}
+
     public Engine engine;
     public World world;
 
@@ -37,8 +39,8 @@ public class Fart extends BaseActor {
 
         tempPosition = new Vector2(x, y);
 
-        loadImage("farts/fart1");
         this.size = size;
+        loadFartImage();
         setSize(size, size);
         setOrigin(Align.center);
 
@@ -78,6 +80,28 @@ public class Fart extends BaseActor {
             })
         ));
     }
+
+    private void loadFartImage() {
+        String imagePath;
+
+        // Check if the size is in the sizes array
+        if (BaseGame.sizes.contains(size, false)) {
+            // Get the index of the size in the sizes array
+            int index = BaseGame.sizes.indexOf(size, false);
+
+            System.out.println("index: " + index);
+            // Create the image path based on the index
+            imagePath = "farts/fart" + index; // Assumes image filenames are like "farts/fart0", "farts/fart1", etc.
+        } else {
+            // Handle the case where size is not in the predefined sizes
+            imagePath = "farts/fartx"; // Change this to the default image path
+        }
+
+        /*System.out.println("size: " + size + ", condition: " + BaseGame.sizes.contains(size, true));
+        System.out.println("fart image path is: " + imagePath);*/
+        loadImage(imagePath);
+    }
+
 
     private Body createBody(World world) {
         BodyDef bodyDef = new BodyDef();
