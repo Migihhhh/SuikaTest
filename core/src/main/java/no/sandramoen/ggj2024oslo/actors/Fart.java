@@ -19,6 +19,7 @@ import com.badlogic.gdx.utils.Align;
 import no.sandramoen.ggj2024oslo.actors.components.BodyComponent;
 import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
 import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
+import no.sandramoen.ggj2024oslo.actors.particles.RedKeyEffect;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
 
@@ -78,11 +79,23 @@ public class Fart extends BaseActor {
     public void fartAnimation() {
         if (hasActions())
             return;
+        mergeEffect();
         shakeCamera(0.25f);
         addAction(Actions.sequence(
                 Actions.scaleTo(1.2f, .8f, .4f, Interpolation.exp10Out),
                 Actions.scaleTo(1f, 1f, .4f, Interpolation.bounceOut)
         ));
+    }
+
+    public void mergeEffect() {
+        RedKeyEffect effect = new RedKeyEffect();
+        effect.setScale(.002f * size * size);
+        effect.setPosition(
+            getX() + getWidth() / 2,
+            getY() + getHeight() / 2
+        );
+        stage.addActor(effect);
+        effect.start();
     }
 
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
