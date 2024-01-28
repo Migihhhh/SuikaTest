@@ -47,7 +47,7 @@ public class BaseActor extends Group {
     public float animationWidth = getWidth();
     public float animationHeight = getWidth();
     public boolean isCollisionEnabled = true;
-    public float shakyCamIntensity = 0.35f;
+    public float shakyCamIntensity = 0.01f;
     public boolean isShakyCam = false;
     public Vector3 storedCameraPosition = new Vector3();
     public final int ID = MathUtils.random(1000, 9999);
