@@ -63,7 +63,7 @@ public class AssetLoader implements AssetErrorListener {
         BaseGame.assetManager.load("images/included/packed/images.pack.atlas", TextureAtlas.class);
 
         // music
-        BaseGame.assetManager.load("audio/music/Fart in Jar sketsj #1 Bsw.wav", Music.class);
+        BaseGame.assetManager.load("audio/music/FartInJar_sketsj1_Bsw.wav", Music.class);
 
         // sounds
         BaseGame.assetManager.load("audio/sound/click1.wav", Sound.class);
@@ -119,7 +119,7 @@ public class AssetLoader implements AssetErrorListener {
 
         // music
         music = new Array();
-        levelMusic = BaseGame.assetManager.get("audio/music/Fart in Jar sketsj #1 Bsw.wav", Music.class);
+        levelMusic = BaseGame.assetManager.get("audio/music/FartInJar_sketsj1_Bsw.wav", Music.class);
         music.add(levelMusic);
 
         // sounds
