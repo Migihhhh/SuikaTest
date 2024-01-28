@@ -68,6 +68,10 @@ public class Fart extends BaseActor {
         body.setLinearVelocity(0, 0);
     }
 
+    public void collide() {
+
+    }
+
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
     private void shakeCamera(float duration) {
@@ -101,7 +105,6 @@ public class Fart extends BaseActor {
         System.out.println("fart image path is: " + imagePath);*/
         loadImage(imagePath);
     }
-
 
     private Body createBody(World world) {
         BodyDef bodyDef = new BodyDef();

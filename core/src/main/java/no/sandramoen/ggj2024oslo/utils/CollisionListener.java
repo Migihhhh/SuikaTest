@@ -63,6 +63,9 @@ public class CollisionListener implements ContactListener {
         if (fartA.size == BaseGame.sizes.get(BaseGame.sizes.size - 1))
             return;
 
+        fartA.collide();
+        fartB.collide();
+
         if (fartA.size == fartB.size) {
             // Calculate the midpoint between fartA and fartB
             float centerX = (fartA.getX() + fartA.getWidth() / 2 + fartB.getX() + fartB.getWidth() / 2) / 2;

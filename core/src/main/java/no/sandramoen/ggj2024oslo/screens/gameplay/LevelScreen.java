@@ -150,6 +150,7 @@ public class LevelScreen extends BaseScreen {
         playFartSound(currentIndex);
 
         Fart newFart = new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
+        newFart.collide();
         fartLights.add(new FartLight(newFart, rayHandler, 2048, Color.GOLD, nextSize * 2,
             fart.getX() + nextSize / 2,
             fart.getY() + nextSize / 2
