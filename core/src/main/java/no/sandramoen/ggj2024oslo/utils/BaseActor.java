@@ -22,6 +22,7 @@ import com.badlogic.gdx.scenes.scene2d.Group;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.Array;
 
+import com.badlogic.gdx.utils.TimeUtils;
 import no.sandramoen.ggj2024oslo.actors.components.ActorComponent;
 
 public class BaseActor extends Group {
@@ -46,8 +47,9 @@ public class BaseActor extends Group {
     public float animationWidth = getWidth();
     public float animationHeight = getWidth();
     public boolean isCollisionEnabled = true;
-    public float shakyCamIntensity = .5f;
+    public float shakyCamIntensity = 0.35f;
     public boolean isShakyCam = false;
+    public Vector3 storedCameraPosition = new Vector3();
     public final int ID = MathUtils.random(1000, 9999);
 
     public BaseActor(float x, float y, Stage stage) {
@@ -289,18 +291,18 @@ public class BaseActor extends Group {
             OrthographicCamera camera = (OrthographicCamera) this.getStage().getViewport().getCamera();
 
             // center camera on actor
-            camera.position.set(new Vector3(
+            camera.position.set(
                     camera.position.x + (targetX + getOriginX() - camera.position.x) * lerp,
                     camera.position.y + (targetY + getOriginY() - camera.position.y) * lerp,
                     0f
-            ));
+            );
 
             /*bindCameraToWorld(camera);*/
             camera.update();
         }
     }
 
-    private void bindCameraToWorld(OrthographicCamera camera) {
+    protected void bindCameraToWorld(OrthographicCamera camera) {
         float minX = (camera.viewportWidth * camera.zoom) / 2;
         float maxX = worldBounds.width - (camera.viewportWidth * camera.zoom) / 2;
         if (minX <= maxX)
@@ -346,20 +348,12 @@ public class BaseActor extends Group {
     }
 
     protected void shakeCamera() {
+        float t = (TimeUtils.millis() & 0x7FFFFFL) * 0.02f;
         this.getStage().getCamera().position.set(
-                new Vector3(
-                        this.getStage().getCamera().position.x + MathUtils.random(
-                                -shakyCamIntensity,
-                                shakyCamIntensity
-                        ),
-                        this.getStage().getCamera().position.y + MathUtils.random(
-                                -shakyCamIntensity,
-                                shakyCamIntensity
-                        ),
-                        0f
-                )
+                storedCameraPosition.x + MathUtils.cos(t+4 * MathUtils.cos(1f-0.79f*t)* MathUtils.cos(4f+1.37f * t)) * shakyCamIntensity,
+                storedCameraPosition.y + MathUtils.sin(t+4 * MathUtils.sin(2f-0.79f*t)* MathUtils.sin(1f+1.37f * t)) * shakyCamIntensity,
+                0f
         );
-        bindCameraToWorld((OrthographicCamera) this.getStage().getCamera());
     }
 
 

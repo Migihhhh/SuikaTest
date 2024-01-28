@@ -1,7 +1,9 @@
 package no.sandramoen.ggj2024oslo.actors;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.math.Interpolation;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -11,6 +13,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.actions.Actions;
+import com.badlogic.gdx.scenes.scene2d.actions.TemporalAction;
 import com.badlogic.gdx.utils.Align;
 
 import no.sandramoen.ggj2024oslo.actors.components.BodyComponent;
@@ -75,24 +78,32 @@ public class Fart extends BaseActor {
     public void fartAnimation() {
         if (hasActions())
             return;
-
+        shakeCamera(0.25f);
         addAction(Actions.sequence(
-            Actions.scaleTo(1.2f, .8f, .4f, Interpolation.exp10Out),
-            Actions.scaleTo(1f, 1f, .4f, Interpolation.bounceOut)
+                Actions.scaleTo(1.2f, .8f, .4f, Interpolation.exp10Out),
+                Actions.scaleTo(1f, 1f, .4f, Interpolation.bounceOut)
         ));
     }
 
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
     private void shakeCamera(float duration) {
+        storedCameraPosition.set(stage.getCamera().position);
         isShakyCam = true;
+        TemporalAction rest = new TemporalAction() {
+            @Override
+            protected void update(float percent) {
+                stage.getCamera().position.lerp(storedCameraPosition, percent);
+            }
+        };
+        rest.setDuration(duration * 0.25f);
+        rest.setInterpolation(Interpolation.circleIn);
         new BaseActor(0f, 0f, stage).addAction(Actions.sequence(
-            Actions.delay(duration),
-            Actions.run(() -> {
-                isShakyCam = false;
-                TiledMapActor.centerPositionCamera(stage);
-            })
-        ));
+                Actions.delay(duration * 0.75f),
+                Actions.run(() -> {
+                    isShakyCam = false;
+                }), rest)
+        );
     }
 
     private void loadFartImage() {
