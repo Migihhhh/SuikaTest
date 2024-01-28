@@ -150,7 +150,7 @@ public class LevelScreen extends BaseScreen {
         playFartSound(currentIndex);
 
         Fart newFart = new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
-        fartLights.add(new FartLight(newFart, rayHandler, 2048, Color.GOLD, nextSize*2,
+        fartLights.add(new FartLight(newFart, rayHandler, 2048, Color.GOLD, nextSize * 2,
             fart.getX() + nextSize / 2,
             fart.getY() + nextSize / 2
         ));
@@ -224,7 +224,8 @@ public class LevelScreen extends BaseScreen {
             BaseGame.loseSensor.startCountDown();
             isCountDown = true;
         } else {
-            BaseGame.loseSensor.stopCountDown();
+            if (BaseGame.loseSensor != null)
+                BaseGame.loseSensor.stopCountDown();
             AssetLoader.clockTickingSound.stop(tickingSoundID);
             isCountDown = false;
             isClockTicking = false;

@@ -2,6 +2,7 @@ package no.sandramoen.ggj2024oslo.actors.map;
 
 import com.badlogic.ashley.core.Engine;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -20,12 +21,21 @@ import no.sandramoen.ggj2024oslo.utils.BaseGame;
 public class ImpassableTerrain extends BaseActor {
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
-    public ImpassableTerrain(float x, float y, float width, float height, Stage stage, Engine engine, World world) {
+    public ImpassableTerrain(float x, float y, float width, float height, Stage stage, Engine engine, World world, String type) {
         super(x, y, stage, engine);
 
-        loadImage("whitePixel");
-        setColor(Color.DARK_GRAY);
+
+        if (type.equals("s")) {
+            loadImage("line0");
+            if (x < 0)
+                bodyOffset.x = -.5f;
+            else
+                bodyOffset.x = .5f;
+        } else if (type.equals("b")) {
+            loadImage("bottom");
+        }
         setSize(width, height);
+        setName(type);
 
         Body body = createBody(world);
         entity.add(new BodyComponent(body));

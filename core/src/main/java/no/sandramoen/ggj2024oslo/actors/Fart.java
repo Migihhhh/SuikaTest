@@ -89,12 +89,12 @@ public class Fart extends BaseActor {
             // Get the index of the size in the sizes array
             int index = BaseGame.sizes.indexOf(size, false);
 
-            System.out.println("index: " + index);
+            // System.out.println("index: " + index);
             // Create the image path based on the index
             imagePath = "farts/fart" + index; // Assumes image filenames are like "farts/fart0", "farts/fart1", etc.
         } else {
             // Handle the case where size is not in the predefined sizes
-            imagePath = "farts/fartx"; // Change this to the default image path
+            imagePath = "farts/fart0"; // Change this to the default image path
         }
 
         /*System.out.println("size: " + size + ", condition: " + BaseGame.sizes.contains(size, true));

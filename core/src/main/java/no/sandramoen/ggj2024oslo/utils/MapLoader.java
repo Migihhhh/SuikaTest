@@ -34,6 +34,7 @@ public class MapLoader {
         // initializeActor("player");
         initializeActors("impassable");
         initializeActors("loseSensor");
+        initializeActors("bottom");
     }
 
     private void initializeActors(String propertyName) {
@@ -51,7 +52,10 @@ public class MapLoader {
             String actualPropertyName = mapProperties.get("name", String.class);
 
             if (actualPropertyName.equals("impassable")) {
-                ImpassableTerrain impassable = new ImpassableTerrain(x, y, width, height, mainStage, engine, world);
+                ImpassableTerrain impassable = new ImpassableTerrain(x, y, width, height, mainStage, engine, world, "s");
+                impassables.add(impassable);
+            } else if (actualPropertyName.equals("bottom")) {
+                ImpassableTerrain impassable = new ImpassableTerrain(x, y, width, height, mainStage, engine, world, "b");
                 impassables.add(impassable);
             } else if (actualPropertyName.equals("loseSensor")) {
                 BaseGame.loseSensor = new LoseSensor(x, y, width, height, mainStage, engine, world);

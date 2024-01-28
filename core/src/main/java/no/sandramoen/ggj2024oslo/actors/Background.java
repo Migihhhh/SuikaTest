@@ -1,5 +1,6 @@
 package no.sandramoen.ggj2024oslo.actors;
 
+import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -15,9 +16,11 @@ public class Background extends BaseActor {
 
     public Background(float x, float y, Stage stage) {
         super(x, y, stage);
-        animationImages.add(AssetLoader.textureAtlas.findRegion("background"));
+        animationImages.add(AssetLoader.textureAtlas.findRegion("background1"));
         animation = new Animation(2f, animationImages, Animation.PlayMode.LOOP);
         setAnimation(animation);
+        setColor(Color.CYAN);
+        getColor().a = .3f;
         setSize(TiledMapActor.mapTileWidth, TiledMapActor.mapTileHeight);
     }
 }
