@@ -150,7 +150,7 @@ public class LevelScreen extends BaseScreen {
         playFartSound(currentIndex);
 
         Fart newFart = new Fart(fart.getX(), fart.getY(), nextSize, mainStage, engine, world);
-        newFart.collide();
+        newFart.fartAnimation();
         fartLights.add(new FartLight(newFart, rayHandler, 2048, Color.GOLD, nextSize * 2,
             fart.getX() + nextSize / 2,
             fart.getY() + nextSize / 2
@@ -320,14 +320,14 @@ public class LevelScreen extends BaseScreen {
     }
 
     private void initializeGUI() {
-        gameOverLabel = new TypingLabel("{COLOR=#000000}{SLOWER}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
+        gameOverLabel = new TypingLabel("{COLOR=#d9b700}{SLOWER}{SICK}G A M E   O V E R !", AssetLoader.getLabelStyle("Play-Bold59white"));
         gameOverLabel.setAlignment(Align.top);
         gameOverLabel.setVisible(false);
 
         scoreLabel = new TypingLabel("{COLOR=#000000}{FAST}Score: 0", AssetLoader.getLabelStyle("Play-Bold59white"));
         scoreLabel.setAlignment(Align.top);
 
-        restartLabel = new TypingLabel("{COLOR=#000000}{SLOWER}press 'r' to restart", AssetLoader.getLabelStyle("Play-Bold40white"));
+        restartLabel = new TypingLabel("{COLOR=#000000}{SLOWER}{HEARTBEAT=0.2;0.1}press 'r' to restart", AssetLoader.getLabelStyle("Play-Bold40white"));
         restartLabel.setAlignment(Align.top);
         restartLabel.setVisible(false);
 

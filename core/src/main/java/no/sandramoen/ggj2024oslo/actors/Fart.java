@@ -1,6 +1,7 @@
 package no.sandramoen.ggj2024oslo.actors;
 
 import com.badlogic.ashley.core.Engine;
+import com.badlogic.gdx.math.Interpolation;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -32,8 +33,11 @@ public class Fart extends BaseActor {
 
     private Vector2 tempPosition;
 
+    private Stage stage;
+
     public Fart(float x, float y, float size, Stage stage, Engine engine, World world) {
         super(x, y, stage, engine);
+        this.stage = stage;
         this.engine = engine;
         this.world = world;
 
@@ -68,19 +72,25 @@ public class Fart extends BaseActor {
         body.setLinearVelocity(0, 0);
     }
 
-    public void collide() {
+    public void fartAnimation() {
+        if (hasActions())
+            return;
 
+        addAction(Actions.sequence(
+            Actions.scaleTo(1.2f, .8f, .4f, Interpolation.exp10Out),
+            Actions.scaleTo(1f, 1f, .4f, Interpolation.bounceOut)
+        ));
     }
 
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
     private void shakeCamera(float duration) {
         isShakyCam = true;
-        new BaseActor(0f, 0f, getStage()).addAction(Actions.sequence(
+        new BaseActor(0f, 0f, stage).addAction(Actions.sequence(
             Actions.delay(duration),
             Actions.run(() -> {
                 isShakyCam = false;
-                TiledMapActor.centerPositionCamera(getStage());
+                TiledMapActor.centerPositionCamera(stage);
             })
         ));
     }
