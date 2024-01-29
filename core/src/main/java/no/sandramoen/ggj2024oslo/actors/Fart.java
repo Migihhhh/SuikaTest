@@ -101,8 +101,8 @@ public class Fart extends BaseActor {
     private final Vector2 bodyOffset = new Vector2(0f, 0f);
 
     private void shakeCamera(float duration) {
-        shakyCamIntensity = size * size * size * .0005f;
-        System.out.println("shakyCamIntensity: " + shakyCamIntensity);
+        shakyCamIntensity = size * size * size * .0006f;
+        // System.out.println("shakyCamIntensity: " + shakyCamIntensity);
 
         storedCameraPosition.set(stage.getCamera().position);
         isShakyCam = true;

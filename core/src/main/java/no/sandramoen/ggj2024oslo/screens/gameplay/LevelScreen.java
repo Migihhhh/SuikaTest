@@ -121,6 +121,7 @@ public class LevelScreen extends BaseScreen {
         // GameUtils.printMousePosition(screenX, screenY, mainStage);
 
         if (droppingFart != null && !gameOverLabel.isVisible()) {
+            droppingFart.body.setTransform(getMouseXInWorld(screenX), droppingFart.body.getPosition().y, droppingFart.body.getAngle());
             droppingFart = null;
             new BaseActor(0f, 0f, mainStage).addAction(Actions.sequence(
                 Actions.delay(newFartDelayDuration),
