@@ -124,7 +124,7 @@ public class LevelScreen extends BaseScreen {
             droppingFart = null;
             new BaseActor(0f, 0f, mainStage).addAction(Actions.sequence(
                 Actions.delay(newFartDelayDuration),
-                Actions.run(() -> createNewFartToDrop())
+                Actions.run(() -> createNewFartToDrop(screenX))
             ));
         }
         return super.touchDown(screenX, screenY, pointer, button);
@@ -240,17 +240,17 @@ public class LevelScreen extends BaseScreen {
             setGameOver();
     }
 
-    private void createNewFartToDrop() {
+    private void createNewFartToDrop(int x) {
         droppingFart = new Fart(
-            getMouseXInWorld(),
+            getMouseXInWorld(x),
             fartSpawnHeight,
             BaseGame.sizes.get(MathUtils.random(0, 4)),
             mainStage, engine, world
         );
     }
 
-    private float getMouseXInWorld() {
-        return mainStage.screenToStageCoordinates(new Vector2(Gdx.input.getX(), 0f)).x;
+    private float getMouseXInWorld(int x) {
+        return mainStage.screenToStageCoordinates(new Vector2(x, 0f)).x;
     }
 
     private void initializeLights() {
