@@ -101,6 +101,15 @@ public class LevelScreen extends BaseScreen {
     }
 
     @Override
+    public boolean touchDragged(int screenX, int screenY, int pointer) {
+        Vector2 worldCoordinates = mainStage.screenToStageCoordinates(new Vector2(screenX, screenY));
+        if (droppingFart != null) {
+            droppingFart.setPosition(new Vector2(worldCoordinates.x, fartSpawnHeight));
+        }
+        return super.touchDragged(screenX, screenY, pointer);
+    }
+
+    @Override
     public boolean keyDown(int keycode) {
         if (keycode == Keys.ESCAPE || keycode == Keys.Q) {
             Gdx.app.exit();
@@ -194,6 +203,7 @@ public class LevelScreen extends BaseScreen {
         float modifier = calculateLogarithmicModifier(currentIndex, minModifier, maxModifier);
 
         modifier = MathUtils.clamp(modifier, minModifier, maxModifier);
+        Gdx.app.log(getClass().toString(), "fart sound: " + (BaseGame.soundVolume * modifier));
         randomSound.play(BaseGame.soundVolume * modifier);
     }
 

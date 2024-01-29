@@ -18,7 +18,6 @@ import com.badlogic.gdx.utils.Align;
 
 import no.sandramoen.ggj2024oslo.actors.components.BodyComponent;
 import no.sandramoen.ggj2024oslo.actors.components.PlayerControlComponent;
-import no.sandramoen.ggj2024oslo.actors.map.TiledMapActor;
 import no.sandramoen.ggj2024oslo.actors.particles.RedKeyEffect;
 import no.sandramoen.ggj2024oslo.utils.BaseActor;
 import no.sandramoen.ggj2024oslo.utils.BaseGame;
