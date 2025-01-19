@@ -46,7 +46,7 @@ public class Suika implements ApplicationListener {
 
         playerSprite = new Sprite(player);
 
-        playerSprite.setY(130f);
+        playerSprite.setY(110f);
         playerSprite.setX(43f);
 
         playerSprite.setSize(15,15);
@@ -94,7 +94,7 @@ public class Suika implements ApplicationListener {
     private void logic() {
 
         playerHitbox = new Rectangle(playerSprite.getX(), playerSprite.getY(), playerSprite.getWidth(), playerSprite.getHeight());
-        playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 10, 100 - playerSprite.getWidth()));
+        playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 21, 92.5f - playerSprite.getWidth()));
 
     }
 
