@@ -8,7 +8,6 @@ import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
-import com.badlogic.gdx.math.Polygon;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
@@ -19,6 +18,7 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 
@@ -27,7 +27,7 @@ public class Suika implements ApplicationListener {
     Texture player;
     Texture background;
 
-    Texture fruit;
+    Texture flower;
 
     ExtendViewport viewport;
 
@@ -35,54 +35,49 @@ public class Suika implements ApplicationListener {
 
 
     Sprite playerSprite;
-    Sprite fruitSprite;
+    Sprite flowerSprite;
     Vector2  touchPos;
-
     Rectangle playerHitbox;
-    Rectangle ground;
-    Rectangle leftLine;
-    Rectangle rightLine;
 
     private final int WORLD_WIDTH = 110;
     private final int WORLD_HEIGHT = 192;
+    private static final float PPM = 100f;
 
     Box2DDebugRenderer debugRenderer;
     OrthographicCamera camera;
 
     World world;
-    Body player2D;
+
+
+    Array<Body> flowers = new Array<Body>();
 
 
     @Override
     public void create() {
         player = new Texture("player.png");
         background = new Texture("gameBackground.png");
-        fruit = new Texture("fruit.png");
+        flower = new Texture("fruit.png");
 
         batch = new SpriteBatch();
         viewport = new ExtendViewport(86, 165);
 
         playerSprite = new Sprite(player);
-        fruitSprite = new Sprite(fruit);
+        playerSprite.setSize(15, 15);
+        playerSprite.setPosition(43f, 110f); // Centered start position
 
-        playerSprite.setY(110f);
-        playerSprite.setX(43f);
-
-        playerSprite.setSize(15,15);
-        fruitSprite.setSize(6,6);
-
-
-        touchPos  = new Vector2();
+        touchPos = new Vector2();
 
         camera = new OrthographicCamera();
         camera.setToOrtho(false, 86, 165);
 
         world = new World(new Vector2(0, -15f), false);
+
         debugRenderer = new Box2DDebugRenderer();
 
-
-
-
+        // Create static platforms once
+        createPlatform(17.5f, 55.5f, 1, 45);
+        createPlatform(68.5f, 55.5f, 1, 45);
+        createPlatform(43, 8.5f, 25, 1);
     }
 
     @Override
@@ -95,16 +90,11 @@ public class Suika implements ApplicationListener {
 
     @Override
     public void render() {
-
-
         input();
         logic();
+        update(Gdx.graphics.getDeltaTime());
         draw();
 
-        createPlatform(17.5f,55.5f,1,45);
-        createPlatform(68.5f,55.5f,1,45);
-        createPlatform(43,8.5f,25,1);
-        update(Gdx.graphics.getDeltaTime());
         debugRenderer.render(world, camera.combined);
     }
 
@@ -123,55 +113,89 @@ public class Suika implements ApplicationListener {
 
         playerHitbox = new Rectangle(playerSprite.getX(), playerSprite.getY(), playerSprite.getWidth(), playerSprite.getHeight());
         playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 23f, 96f - playerSprite.getWidth()));
-        fruitSprite.setX(MathUtils.clamp(playerSprite.getX(), 23f, 96f - playerSprite.getWidth()));
 
     }
 
-    private void draw() {
 
+
+
+    private void draw() {
         ScreenUtils.clear(Color.BLACK);
         viewport.apply();
 
-
         batch.begin();
-
-
         batch.draw(background, 0, -25, WORLD_WIDTH, WORLD_HEIGHT);
         playerSprite.draw(batch);
 
+        for (Body body : flowers) {
+            if (body.getUserData() instanceof Sprite) {
+                Sprite flowerSprite = (Sprite) body.getUserData();
+                System.out.println("Flower Sprite Position: " + flowerSprite.getX() + ", " + flowerSprite.getY());
 
+                // Adjust the sprite's position to align with the body's center
+                // We can keep this as is for now
+                flowerSprite.setPosition(
+                    body.getPosition().x - flowerSprite.getWidth() / 2, // Centering sprite based on body
+                    body.getPosition().y - flowerSprite.getHeight() / 2 // Same for Y-axis
+                );
 
+                System.out.println("Flower Body Position: " + body.getPosition());
 
+                // Update the sprite's rotation to match the body's rotation
+                flowerSprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
 
+                flowerSprite.draw(batch);
+
+                if (body.getPosition().y < -250) {
+                    flowers.removeValue(body, true);
+                    world.destroyBody(body);
+                    System.out.println("Flower destroyed");
+                }
+            }
+        }
 
         batch.end();
     }
 
-    public Body createFlower(){
-        Body pBody;
+    private Body createFlower() {
+        Body flowerBody;
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
-        def.position.set(playerSprite.getX(), playerSprite.getY());
-        pBody = world.createBody(def);
+        // Adjust initial position by 3f to correct the misalignment
+        def.position.set(playerSprite.getX(), playerSprite.getY());  // Adjusted for alignment
+        flowerBody = world.createBody(def);
+        System.out.println("Flower created at: " + flowerBody.getPosition());
 
+        // Create a circular hitbox
         CircleShape circle = new CircleShape();
-        circle.setRadius(2f);
-
+        circle.setRadius(3f); // Adjust radius to match the flower's size
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
         fixtureDef.density = 0.5f;
         fixtureDef.friction = 0.4f;
-        fixtureDef.restitution = 0.11f; // Make it bounce a little bit
+        fixtureDef.restitution = 0.11f;
 
-        Fixture fixture = pBody.createFixture(fixtureDef);
+        Fixture fixture = flowerBody.createFixture(fixtureDef);
+        circle.dispose();
 
+        // Create flower sprite
+        Sprite newFlowerSprite = new Sprite(flower);
+        newFlowerSprite.setSize(6, 6); // Adjust size as needed
+        newFlowerSprite.setOriginCenter(); // Ensure the sprite's origin is centered
 
+        // Attach the sprite as userData
+        flowerBody.setUserData(newFlowerSprite);
 
-        return pBody;
+        // Add the flower body to the flowers array for rendering
+        flowers.add(flowerBody);
+
+        return flowerBody;
+
     }
 
-    public Body createPlatform(float posx, float posy, float width, float height){
+
+    public void createPlatform(float posx, float posy, float width, float height){
         Body ground;
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.StaticBody;
@@ -184,7 +208,6 @@ public class Suika implements ApplicationListener {
         ground.createFixture(shape,1);
         shape.dispose();
 
-        return ground;
     }
 
     @Override
@@ -204,7 +227,7 @@ public class Suika implements ApplicationListener {
         batch.dispose();
         player.dispose();
         background.dispose();
-        fruit.dispose();
+        flower.dispose();
 
     }
 
