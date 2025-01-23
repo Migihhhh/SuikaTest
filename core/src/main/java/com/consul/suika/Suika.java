@@ -23,6 +23,8 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.concurrent.Flow;
+
 
 public class Suika implements ApplicationListener {
     private static final float PPM = 100f; // Pixels per meter
@@ -30,6 +32,7 @@ public class Suika implements ApplicationListener {
     // World dimensions in meters
     private final int WORLD_WIDTH = 110; // in pixels
     private final int WORLD_HEIGHT = 192; // in pixels
+    private FlowerContactListener contactListener = new FlowerContactListener ();
 
     Texture player;
     Texture background;
@@ -55,18 +58,19 @@ public class Suika implements ApplicationListener {
 
         batch = new SpriteBatch();
 
-        // Initialize FitViewport with physics world units
         viewport = new FitViewport(WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
         camera = (OrthographicCamera) viewport.getCamera();
 
         playerSprite = new Sprite(player);
-        playerSprite.setSize(15 / PPM, 15 / PPM); // Convert to meters
-        playerSprite.setPosition((WORLD_WIDTH / 2f) / PPM - playerSprite.getWidth() / 2, 135 / PPM); // Centered start position
+        playerSprite.setSize(15 / PPM, 15 / PPM);
+        playerSprite.setPosition((WORLD_WIDTH / 2f) / PPM - playerSprite.getWidth() / 2, 135 / PPM);
 
         touchPos = new Vector2();
 
         world = new World(new Vector2(0, -9.8f), false);
         debugRenderer = new Box2DDebugRenderer();
+
+        world.setContactListener(contactListener);
 
         // Create static platforms
         createPlatform(22.5f / PPM, 80.5f / PPM, 1 / PPM, 45 / PPM);
@@ -116,18 +120,56 @@ public class Suika implements ApplicationListener {
         viewport.unproject(touchPos);
         playerSprite.setCenterX(MathUtils.clamp(touchPos.x, 27.5f / PPM, (96 - playerSprite.getWidth() * PPM) / PPM));
         if (Gdx.input.justTouched()) {
-            createFlower();
+            createFlower(FlowerType.CHERRY);
         }
     }
 
-    private Body createFlower() {
+    public enum FlowerType {
+        CHERRY(1, 3 / PPM),
+        STRAWBERRY(2, 4 / PPM),
+        GRAPE(3, 5 / PPM),
+        ORANGE(4, 6 / PPM),
+        APPLE(5, 7 / PPM),
+        PEAR(6, 8 / PPM),
+        PEACH(7, 9 / PPM),
+        PINEAPPLE(8, 10 / PPM),
+        MELON(9, 11 / PPM);
+
+        private final int level;
+        private final float radius;
+
+        FlowerType(int level, float radius) {
+            this.level = level;
+            this.radius = radius;
+        }
+
+        public int getLevel() {
+            return level;
+        }
+
+        public float getRadius() {
+            return radius;
+        }
+
+        public static FlowerType getNextType(FlowerType currentType) {
+            int nextLevel = currentType.getLevel() + 1;
+            for (FlowerType type : values()) {
+                if (type.getLevel() == nextLevel) {
+                    return type;
+                }
+            }
+            return null; // No next type (e.g., melon)
+        }
+    }
+
+    private Body createFlower(FlowerType type) {
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
-        def.position.set(playerSprite.getX() + playerSprite.getWidth() / 2, playerSprite.getY() + playerSprite.getHeight() / 2); // Adjust for sprite center
+        def.position.set(playerSprite.getX() + playerSprite.getWidth() / 2, playerSprite.getY() + playerSprite.getHeight() / 2);
         Body flowerBody = world.createBody(def);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(3 / PPM); // Adjust for PPM
+        circle.setRadius(type.getRadius());
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
@@ -139,13 +181,17 @@ public class Suika implements ApplicationListener {
         circle.dispose();
 
         Sprite newFlowerSprite = new Sprite(flower);
-        newFlowerSprite.setSize(6 / PPM, 6 / PPM );
+        newFlowerSprite.setSize(type.getRadius() * 2, type.getRadius() * 2 );
         newFlowerSprite.setOriginCenter();
-        flowerBody.setUserData(newFlowerSprite);
+        flowerBody.setUserData(type);
         flowers.add(flowerBody);
 
         return flowerBody;
     }
+
+
+
+
 
     private void logic() {
         playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 23 / PPM, (96 - playerSprite.getWidth() * PPM) / PPM));
@@ -182,6 +228,43 @@ public class Suika implements ApplicationListener {
     public void resume() {}
 
     public void update(float delta) {
-        world.step(1 / 230f, 6, 2);
+        world.step(1 / 240f, 6, 2);
+
+        // Check for fruits to merge
+        Array<Body> flowersToMerge = contactListener.getFlowersToMerge();
+        if (flowersToMerge.size >= 2) {
+            Body flowerA = flowersToMerge.get(0);
+            Body flowerB = flowersToMerge.get(1);
+
+            FlowerType typeA = (FlowerType) flowerA.getUserData();
+            FlowerType typeB = (FlowerType) flowerB.getUserData();
+
+            Gdx.app.log("Merge", "Flower A: " + typeA + ", Flower B: " + typeB);
+
+            if (typeA == typeB) {
+                // Merge flowers
+                FlowerType nextType = FlowerType.getNextType(typeA);
+                if (nextType != null) {
+                    Vector2 newPosition = new Vector2(
+                        (flowerA.getPosition().x + flowerB.getPosition().x) / 2,
+                        (flowerA.getPosition().y + flowerB.getPosition().y) / 2
+                    );
+
+                    Gdx.app.log("Merge", "Creating new flower: " + nextType);
+
+                    // Remove old flowers
+                    world.destroyBody(flowerA);
+                    world.destroyBody(flowerB);
+                    flowers.removeValue(flowerA, true);
+                    flowers.removeValue(flowerB, true);
+
+                    // Create new flower
+                    createFlower(nextType).setTransform(newPosition, 0);
+                }
+            }
+
+            // Clear the merge list after processing
+            contactListener.clearFlowersToMerge();
+        }
     }
 }
