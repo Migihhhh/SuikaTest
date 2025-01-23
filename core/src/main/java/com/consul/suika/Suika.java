@@ -2,11 +2,13 @@ package com.consul.suika;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
@@ -23,6 +25,7 @@ import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
+import java.util.Arrays;
 import java.util.concurrent.Flow;
 
 
@@ -47,15 +50,20 @@ public class Suika implements ApplicationListener {
 
     Sprite playerSprite;
     Vector2 touchPos;
+    private boolean debugMode = false;
 
     Box2DDebugRenderer debugRenderer;
     OrthographicCamera camera;
 
     World world;
+    ShapeRenderer shapeRenderer;
     Array<Body> flowers = new Array<>();
+
+    private FlowerType currentFlowerType = FlowerType.DAFFODIL;
 
     @Override
     public void create() {
+        shapeRenderer = new ShapeRenderer();
         player = new Texture("player.png");
         background = new Texture("gameBackground.png");
         daffidol = new Texture("flower1.png");
@@ -63,6 +71,7 @@ public class Suika implements ApplicationListener {
         marrigold = new Texture("flower3.png");
         cherryblossom = new Texture("flower4.png");
         orchid = new Texture("flower5.png");
+        //STEP 1 OF ADDING NEW FLOWER: CREATE A TEXTURE FOR THE FLOWER AS SEEN HERE
 
         batch = new SpriteBatch();
 
@@ -70,7 +79,7 @@ public class Suika implements ApplicationListener {
         camera = (OrthographicCamera) viewport.getCamera();
 
         playerSprite = new Sprite(player);
-        playerSprite.setSize(15 / PPM, 15 / PPM);
+        playerSprite.setSize(15 / PPM, 15 / PPM); // POSITION OF PLAYER
         playerSprite.setPosition((WORLD_WIDTH / 2f) / PPM - playerSprite.getWidth() / 2, 135 / PPM);
 
         touchPos = new Vector2();
@@ -80,7 +89,7 @@ public class Suika implements ApplicationListener {
 
         world.setContactListener(contactListener);
 
-        // Create static platforms
+        // CREATE THE FLOORS AND WALLS
         createPlatform(22.5f / PPM, 80.5f / PPM, 1 / PPM, 45 / PPM);
         createPlatform(87.5f / PPM, 80.5f / PPM, 1 / PPM, 45 / PPM);
         createPlatform(56 / PPM, 33.5f / PPM, 36 / PPM, 1 / PPM);
@@ -106,7 +115,7 @@ public class Suika implements ApplicationListener {
         batch.draw(background, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
         playerSprite.draw(batch);
 
-        for (Body body : flowers) {
+        for (Body body : flowers) { //DISPLAY THE FLOWER SPRITES
             if (body.getUserData() instanceof FlowerData) {
                 FlowerData flowerData = (FlowerData) body.getUserData();
                 Sprite flowerSprite = flowerData.sprite;
@@ -121,28 +130,51 @@ public class Suika implements ApplicationListener {
 
         batch.end();
 
-        debugRenderer.render(world, camera.combined);
+        if (debugMode) {
+            //SHOW THE END GAME LINE
+            shapeRenderer.setProjectionMatrix(camera.combined);
+            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+            shapeRenderer.setColor(Color.RED); // Set the line color
+            float gameOverHeight = WORLD_HEIGHT / PPM - 45 / PPM; // Game-over height
+            shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight); // Draw the line
+            shapeRenderer.end();
+            debugRenderer.render(world, camera.combined);
+        }
     }
 
     private void input() {
         touchPos.set(Gdx.input.getX(), Gdx.input.getY());
         viewport.unproject(touchPos);
         playerSprite.setCenterX(MathUtils.clamp(touchPos.x, 27.5f / PPM, (96 - playerSprite.getWidth() * PPM) / PPM));
+
+        //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
         if (Gdx.input.justTouched()) {
-            createFlower(FlowerType.DAFFODIL);
+            createFlower(currentFlowerType);
+            cycleFlowerType();
+        }
+
+        //THIS TOGGLES THE HITBOXES
+        if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F3)) {
+            debugMode = !debugMode;
+            Gdx.app.log("Debug", "Debug mode: " + (debugMode ? "ON" : "OFF"));
         }
     }
 
     public enum FlowerType {
+        //STEP 2 OF ADDING NEW FLOWER: THIS WILL SET THE FLOWER LEVEL AND ITS SIZE
         DAFFODIL(1, 4 / PPM),
         BUTTERCUP(2, 6 / PPM),
         MARRIGOLD(3, 8 / PPM),
         CHERRYBLOSSOM(4, 10 / PPM),
         ORCHID(5, 12 / PPM),
+        // PLEASE RENAME THESE BELOW!
         PEAR(6, 8 / PPM),
         PEACH(7, 9 / PPM),
         PINEAPPLE(8, 10 / PPM),
         MELON(9, 11 / PPM);
+
+
+
 
         private final int level;
         private final float radius;
@@ -167,10 +199,11 @@ public class Suika implements ApplicationListener {
                     return type;
                 }
             }
-            return null; // No next type (e.g., melon)
+            return null;
         }
     }
 
+    // FOR SPRITES TO LOAD ON DIFFERENT FLOWER TYPES
     public class FlowerData {
         public Sprite sprite;
         public FlowerType type;
@@ -181,6 +214,22 @@ public class Suika implements ApplicationListener {
         }
     }
 
+
+    //THIS CYCLES THE FLOWERS
+    private void cycleFlowerType() {
+        FlowerType[] flowerTypes = {
+            FlowerType.DAFFODIL,
+            FlowerType.BUTTERCUP,
+            FlowerType.MARRIGOLD,
+            FlowerType.CHERRYBLOSSOM
+        };
+        int currentIndex = Arrays.asList(flowerTypes).indexOf(currentFlowerType);
+        int nextIndex = (currentIndex + 1) % flowerTypes.length;
+        currentFlowerType = flowerTypes[nextIndex];
+    }
+
+
+    //THIS CREATES THE FLOWERS
     private Body createFlower(FlowerType type) {
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
@@ -188,7 +237,7 @@ public class Suika implements ApplicationListener {
         Body flowerBody = world.createBody(def);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(type.getRadius() * 0.7f);
+        circle.setRadius(type.getRadius() * 0.7f); //FIX THE HITBOX
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
@@ -199,6 +248,8 @@ public class Suika implements ApplicationListener {
         flowerBody.createFixture(fixtureDef);
         circle.dispose();
 
+
+        //STEP 3 OF ADDING ANOTHER FLOWER: DONT FORGET TO ADD IT HERE, THIS WILL ADD THE FLOWER TO THE GAME
         Texture flowerTexture;
         switch (type) {
             case DAFFODIL:
@@ -216,7 +267,8 @@ public class Suika implements ApplicationListener {
             case ORCHID:
                 flowerTexture = orchid;
                 break;
-            // Add cases for other flower types...
+
+
             default:
                 flowerTexture = daffidol; // Default texture
                 break;
@@ -235,10 +287,12 @@ public class Suika implements ApplicationListener {
 
 
 
+    // STOPS THE PLAYER GOING OUTSIDE
     private void logic() {
         playerSprite.setX(MathUtils.clamp(playerSprite.getX(), 23 / PPM, (96 - playerSprite.getWidth() * PPM) / PPM));
     }
 
+    // CREATES THE WALL AND FLOORS
     private void createPlatform(float posX, float posY, float width, float height) {
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.StaticBody;
@@ -253,6 +307,7 @@ public class Suika implements ApplicationListener {
         shape.dispose();
     }
 
+    //DISPOSING STUFF FOR OPTIMIZING GAME
     @Override
     public void dispose() {
         batch.dispose();
@@ -268,10 +323,30 @@ public class Suika implements ApplicationListener {
     @Override
     public void resume() {}
 
-    public void update(float delta) {
-        world.step(1 / 240f, 6, 2);
 
-        // Check for flowers to merge
+    //IF GAME FAILS
+    private boolean isGameOver() {
+        for (Body body : flowers) {
+            if (body.getPosition().y > WORLD_HEIGHT / PPM - 45 / PPM) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+    //LOOK FOR A CERTAIN UPDATE
+    public void update(float delta) {
+        //UPDATE EVERY 1/240 FRAMES
+        world.step(1 / 240f, 6, 2);
+        // IF GAME FAILS THIS WILL HAPPEN
+        if (isGameOver()) {
+            Gdx.app.log("Game Over", "A flower reached the top!");
+            // Handle game over logic (e.g., stop the game, show a message, etc.)
+            return;
+        }
+
+        // CHECK FOR FLOWER MERGING
         Array<Body> flowersToMerge = contactListener.getFlowersToMerge();
         if (flowersToMerge.size >= 2) {
             Body flowerA = flowersToMerge.get(0);
@@ -287,7 +362,7 @@ public class Suika implements ApplicationListener {
                 Gdx.app.log("Merge", "Flower A: " + typeA + ", Flower B: " + typeB);
 
                 if (typeA == typeB) {
-                    // Merge flowers
+                    // MERGE FLOWERS
                     FlowerType nextType = FlowerType.getNextType(typeA);
                     if (nextType != null) {
                         Vector2 newPosition = new Vector2(
@@ -297,19 +372,19 @@ public class Suika implements ApplicationListener {
 
                         Gdx.app.log("Merge", "Creating new flower: " + nextType);
 
-                        // Remove old flowers
+                        // REMOVE OLD FLOWERS
                         world.destroyBody(flowerA);
                         world.destroyBody(flowerB);
                         flowers.removeValue(flowerA, true);
                         flowers.removeValue(flowerB, true);
 
-                        // Create new flower
+                        // CREATE NEW FLOWER
                         createFlower(nextType).setTransform(newPosition, 0);
                     }
                 }
             }
 
-            // Clear the merge list after processing
+            // CLEAR THE LIST
             contactListener.clearFlowersToMerge();
         }
     }
