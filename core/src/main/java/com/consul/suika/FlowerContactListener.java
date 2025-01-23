@@ -18,10 +18,13 @@ public class FlowerContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getBody().getUserData() instanceof Suika.FlowerType &&
-            fixtureB.getBody().getUserData() instanceof Suika.FlowerType) {
-            Suika.FlowerType typeA = (Suika.FlowerType) fixtureA.getBody().getUserData();
-            Suika.FlowerType typeB = (Suika.FlowerType) fixtureB.getBody().getUserData();
+        if (fixtureA.getBody().getUserData() instanceof Suika.FlowerData &&
+            fixtureB.getBody().getUserData() instanceof Suika.FlowerData) {
+            Suika.FlowerData dataA = (Suika.FlowerData) fixtureA.getBody().getUserData();
+            Suika.FlowerData dataB = (Suika.FlowerData) fixtureB.getBody().getUserData();
+
+            Suika.FlowerType typeA = dataA.type;
+            Suika.FlowerType typeB = dataB.type;
 
             Gdx.app.log("Collision", "Flower A: " + typeA + ", Flower B: " + typeB);
 

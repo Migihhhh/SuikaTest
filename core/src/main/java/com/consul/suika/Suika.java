@@ -36,7 +36,11 @@ public class Suika implements ApplicationListener {
 
     Texture player;
     Texture background;
-    Texture flower;
+    Texture daffidol;
+    Texture buttercup;
+    Texture marrigold;
+    Texture cherryblossom;
+    Texture orchid;
 
     FitViewport viewport;
     SpriteBatch batch;
@@ -54,7 +58,11 @@ public class Suika implements ApplicationListener {
     public void create() {
         player = new Texture("player.png");
         background = new Texture("gameBackground.png");
-        flower = new Texture("fruit.png");
+        daffidol = new Texture("flower1.png");
+        buttercup = new Texture("flower2.png");
+        marrigold = new Texture("flower3.png");
+        cherryblossom = new Texture("flower4.png");
+        orchid = new Texture("flower5.png");
 
         batch = new SpriteBatch();
 
@@ -99,8 +107,9 @@ public class Suika implements ApplicationListener {
         playerSprite.draw(batch);
 
         for (Body body : flowers) {
-            if (body.getUserData() instanceof Sprite) {
-                Sprite flowerSprite = (Sprite) body.getUserData();
+            if (body.getUserData() instanceof FlowerData) {
+                FlowerData flowerData = (FlowerData) body.getUserData();
+                Sprite flowerSprite = flowerData.sprite;
                 flowerSprite.setPosition(
                     (body.getPosition().x +.5f / PPM) - flowerSprite.getWidth() / 2,
                     (body.getPosition().y +.5f / PPM) - flowerSprite.getHeight() / 2
@@ -120,16 +129,16 @@ public class Suika implements ApplicationListener {
         viewport.unproject(touchPos);
         playerSprite.setCenterX(MathUtils.clamp(touchPos.x, 27.5f / PPM, (96 - playerSprite.getWidth() * PPM) / PPM));
         if (Gdx.input.justTouched()) {
-            createFlower(FlowerType.CHERRY);
+            createFlower(FlowerType.DAFFODIL);
         }
     }
 
     public enum FlowerType {
-        CHERRY(1, 3 / PPM),
-        STRAWBERRY(2, 4 / PPM),
-        GRAPE(3, 5 / PPM),
-        ORANGE(4, 6 / PPM),
-        APPLE(5, 7 / PPM),
+        DAFFODIL(1, 4 / PPM),
+        BUTTERCUP(2, 6 / PPM),
+        MARRIGOLD(3, 8 / PPM),
+        CHERRYBLOSSOM(4, 10 / PPM),
+        ORCHID(5, 12 / PPM),
         PEAR(6, 8 / PPM),
         PEACH(7, 9 / PPM),
         PINEAPPLE(8, 10 / PPM),
@@ -162,6 +171,16 @@ public class Suika implements ApplicationListener {
         }
     }
 
+    public class FlowerData {
+        public Sprite sprite;
+        public FlowerType type;
+
+        public FlowerData(Sprite sprite, FlowerType type) {
+            this.sprite = sprite;
+            this.type = type;
+        }
+    }
+
     private Body createFlower(FlowerType type) {
         BodyDef def = new BodyDef();
         def.type = BodyDef.BodyType.DynamicBody;
@@ -169,7 +188,7 @@ public class Suika implements ApplicationListener {
         Body flowerBody = world.createBody(def);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(type.getRadius());
+        circle.setRadius(type.getRadius() * 0.7f);
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
@@ -180,10 +199,33 @@ public class Suika implements ApplicationListener {
         flowerBody.createFixture(fixtureDef);
         circle.dispose();
 
-        Sprite newFlowerSprite = new Sprite(flower);
+        Texture flowerTexture;
+        switch (type) {
+            case DAFFODIL:
+                flowerTexture = daffidol;
+                break;
+            case BUTTERCUP:
+                flowerTexture = buttercup;
+                break;
+            case MARRIGOLD:
+                flowerTexture = marrigold;
+                break;
+            case CHERRYBLOSSOM:
+                flowerTexture = cherryblossom;
+                break;
+            case ORCHID:
+                flowerTexture = orchid;
+                break;
+            // Add cases for other flower types...
+            default:
+                flowerTexture = daffidol; // Default texture
+                break;
+        }
+
+        Sprite newFlowerSprite = new Sprite(flowerTexture);
         newFlowerSprite.setSize(type.getRadius() * 2, type.getRadius() * 2 );
         newFlowerSprite.setOriginCenter();
-        flowerBody.setUserData(type);
+        flowerBody.setUserData(new FlowerData(newFlowerSprite, type));
         flowers.add(flowerBody);
 
         return flowerBody;
@@ -216,7 +258,6 @@ public class Suika implements ApplicationListener {
         batch.dispose();
         player.dispose();
         background.dispose();
-        flower.dispose();
         world.dispose();
         debugRenderer.dispose();
     }
@@ -230,36 +271,41 @@ public class Suika implements ApplicationListener {
     public void update(float delta) {
         world.step(1 / 240f, 6, 2);
 
-        // Check for fruits to merge
+        // Check for flowers to merge
         Array<Body> flowersToMerge = contactListener.getFlowersToMerge();
         if (flowersToMerge.size >= 2) {
             Body flowerA = flowersToMerge.get(0);
             Body flowerB = flowersToMerge.get(1);
 
-            FlowerType typeA = (FlowerType) flowerA.getUserData();
-            FlowerType typeB = (FlowerType) flowerB.getUserData();
+            if (flowerA.getUserData() instanceof FlowerData && flowerB.getUserData() instanceof FlowerData) {
+                FlowerData dataA = (FlowerData) flowerA.getUserData();
+                FlowerData dataB = (FlowerData) flowerB.getUserData();
 
-            Gdx.app.log("Merge", "Flower A: " + typeA + ", Flower B: " + typeB);
+                FlowerType typeA = dataA.type;
+                FlowerType typeB = dataB.type;
 
-            if (typeA == typeB) {
-                // Merge flowers
-                FlowerType nextType = FlowerType.getNextType(typeA);
-                if (nextType != null) {
-                    Vector2 newPosition = new Vector2(
-                        (flowerA.getPosition().x + flowerB.getPosition().x) / 2,
-                        (flowerA.getPosition().y + flowerB.getPosition().y) / 2
-                    );
+                Gdx.app.log("Merge", "Flower A: " + typeA + ", Flower B: " + typeB);
 
-                    Gdx.app.log("Merge", "Creating new flower: " + nextType);
+                if (typeA == typeB) {
+                    // Merge flowers
+                    FlowerType nextType = FlowerType.getNextType(typeA);
+                    if (nextType != null) {
+                        Vector2 newPosition = new Vector2(
+                            (flowerA.getPosition().x + flowerB.getPosition().x) / 2,
+                            (flowerA.getPosition().y + flowerB.getPosition().y) / 2
+                        );
 
-                    // Remove old flowers
-                    world.destroyBody(flowerA);
-                    world.destroyBody(flowerB);
-                    flowers.removeValue(flowerA, true);
-                    flowers.removeValue(flowerB, true);
+                        Gdx.app.log("Merge", "Creating new flower: " + nextType);
 
-                    // Create new flower
-                    createFlower(nextType).setTransform(newPosition, 0);
+                        // Remove old flowers
+                        world.destroyBody(flowerA);
+                        world.destroyBody(flowerB);
+                        flowers.removeValue(flowerA, true);
+                        flowers.removeValue(flowerB, true);
+
+                        // Create new flower
+                        createFlower(nextType).setTransform(newPosition, 0);
+                    }
                 }
             }
 
