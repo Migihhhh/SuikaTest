@@ -256,17 +256,17 @@ public class Suika implements ApplicationListener {
     public enum FlowerType {
         //STEP 3 OF ADDING NEW FLOWER: THIS WILL SET THE FLOWER LEVEL AND ITS SIZE
         DAFFODIL(1, 4 / PPM),
-        BUTTERCUP(2, 6 / PPM),
-        MARRIGOLD(3, 8 / PPM),
-        CHERRYBLOSSOM(4, 10 / PPM),
-        ORCHID(5, 12 / PPM),
+        BUTTERCUP(2, 8 / PPM),
+        MARRIGOLD(3, 10 / PPM),
+        CHERRYBLOSSOM(4, 14 / PPM),
+        ORCHID(5, 18 / PPM),
         // PLEASE RENAME THESE BELOW!
-        SUNFLOWER(6, 14 / PPM),
-        JASMINE(7, 16 / PPM),
-        FREESIA(8, 18 / PPM),
-        DAISY(9, 20 / PPM),
-        DANDELION(10, 22 / PPM),
-        HIBISCUS(11, 24 / PPM);
+        SUNFLOWER(6, 22 / PPM),
+        JASMINE(7, 26 / PPM),
+        FREESIA(8, 30 / PPM),
+        DAISY(9, 34 / PPM),
+        DANDELION(10, 38 / PPM),
+        HIBISCUS(11, 42 / PPM);
 
         private final int level;
         private final float radius;
