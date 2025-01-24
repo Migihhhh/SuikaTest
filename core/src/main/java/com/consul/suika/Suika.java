@@ -61,6 +61,13 @@ public class Suika implements ApplicationListener {
     private FlowerType currentFlowerType = FlowerType.DAFFODIL;
 
     private Sprite floatingFlowerSprite;
+    private boolean isTouching = false;
+    Texture sunflower;
+    Texture jasmine;
+    Texture freesia;
+    Texture daisy;
+    Texture dandelion;
+    Texture hibiscus;
 
     //STEP 1 OF ADDING NEW FLOWER: CALL YOUR VARIABLE I.E "Texture newFlower;"
 
@@ -73,6 +80,13 @@ public class Suika implements ApplicationListener {
         marrigold = new Texture("flower3.png");
         cherryblossom = new Texture("flower4.png");
         orchid = new Texture("flower5.png");
+        sunflower = new Texture("flower6.png");
+        jasmine = new Texture("flower7.png");
+        freesia = new Texture("flower8.png");
+        daisy = new Texture("flower9.png");
+        dandelion = new Texture("flower10.png");
+        hibiscus = new Texture("flower11.png");
+
         //STEP 2 OF ADDING NEW FLOWER: CREATE A TEXTURE FOR THE FLOWER AS SEEN ABOVE HERE
 
         batch = new SpriteBatch();
@@ -144,6 +158,7 @@ public class Suika implements ApplicationListener {
         return flowerTypes[nextIndex];
     }
 
+
     @Override
     public void render() {
         input();
@@ -177,13 +192,21 @@ public class Suika implements ApplicationListener {
         }
         batch.end();
 
+        // this entire shapeRenderer is the guidelines
+        shapeRenderer.setProjectionMatrix(camera.combined);
+        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+        shapeRenderer.setColor(Color.WHITE);
+
+        shapeRenderer.line((floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), floatingFlowerSprite.getY(), (floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), 33.5f / PPM);
+        shapeRenderer.end();
+
         if (debugMode) {
             //SHOW THE END GAME LINE
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.RED); // Set the line color
+            shapeRenderer.setColor(Color.RED);
             float gameOverHeight = WORLD_HEIGHT / PPM - 45 / PPM; // Game-over height
-            shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight); // Draw the line
+            shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight);
             shapeRenderer.end();
             debugRenderer.render(world, camera.combined);
         }
@@ -195,24 +218,35 @@ public class Suika implements ApplicationListener {
         floatingFlowerSprite.setCenterX(MathUtils.clamp(touchPos.x, 27.5f / PPM, (96 - floatingFlowerSprite.getWidth() * PPM) / PPM));
 
         //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
-        if (Gdx.input.justTouched()) {
+        if (Gdx.input.isTouched()) {
+            touchPos.set(Gdx.input.getX(), Gdx.input.getY());
+            viewport.unproject(touchPos);
+
+            float newX = MathUtils.clamp(
+                touchPos.x - floatingFlowerSprite.getWidth() / 2, // Center the touch position
+                23 / PPM, // Left bound
+                (96 - floatingFlowerSprite.getWidth() * PPM) / PPM // Right bound
+            );
+            floatingFlowerSprite.setX(newX);
+
+            isTouching = true;
+        } else if (isTouching) {
+            // If the screen was being touched and is no longer touched, drop the flower
             float spawnX = floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2;
             float spawnY = floatingFlowerSprite.getY();
-            Gdx.app.log("Spawn Position", "X: " + spawnX + ", Y: " + spawnY); // Debug logging
-            createFlower(currentFlowerType, spawnX, spawnY, false);
-            cycleFlowerType();
+            createFlower(currentFlowerType, spawnX, spawnY, false); // Create the flower
 
-            // Update the current and next flower types
             currentFlowerType = nextFlowerType;
             nextFlowerType = getNextFlowerType(currentFlowerType);
 
-            // Update the floating flower sprite
             Texture flowerTexture = getTextureForFlowerType(currentFlowerType);
             floatingFlowerSprite.setTexture(flowerTexture);
             floatingFlowerSprite.setSize(currentFlowerType.getRadius() * 2, currentFlowerType.getRadius() * 2);
+
+            isTouching = false;
         }
 
-        //THIS TOGGLES THE HITBOXES
+        // THIS TOGGLES THE HITBOXES
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F3)) {
             debugMode = !debugMode;
             Gdx.app.log("Debug", "Debug mode: " + (debugMode ? "ON" : "OFF"));
@@ -227,13 +261,12 @@ public class Suika implements ApplicationListener {
         CHERRYBLOSSOM(4, 10 / PPM),
         ORCHID(5, 12 / PPM),
         // PLEASE RENAME THESE BELOW!
-        PEAR(6, 8 / PPM),
-        PEACH(7, 9 / PPM),
-        PINEAPPLE(8, 10 / PPM),
-        MELON(9, 11 / PPM);
-
-
-
+        SUNFLOWER(6, 14 / PPM),
+        JASMINE(7, 16 / PPM),
+        FREESIA(8, 18 / PPM),
+        DAISY(9, 20 / PPM),
+        DANDELION(10, 22 / PPM),
+        HIBISCUS(11, 24 / PPM);
 
         private final int level;
         private final float radius;
@@ -304,9 +337,21 @@ public class Suika implements ApplicationListener {
                 return cherryblossom;
             case ORCHID: //NAME OF FLOWER
                 return orchid; //THIS IS THE TEXTURE
+            case SUNFLOWER:
+                return sunflower;
+            case JASMINE:
+                return jasmine;
+            case FREESIA:
+                return freesia;
+            case DAISY:
+                return daisy;
+            case DANDELION:
+                return dandelion;
+            case HIBISCUS:
+                return hibiscus;
             //STEP 4 OF ADDING NEW FLOWER: ADD THE NAME OF THE FLOWER AND THE TEXTURE
             default:
-                return daffidol; // Default texture
+                return hibiscus; // Default texture
         }
     }
 
@@ -317,7 +362,6 @@ public class Suika implements ApplicationListener {
 
     //THIS CREATES THE FLOWERS
     private Body createFlower(FlowerType type, float x, float y, boolean isMerging) {
-        // If not merging, restrict to the 4 specific flower types
         if (!isMerging && !Arrays.asList(
             FlowerType.DAFFODIL,
             FlowerType.BUTTERCUP,
@@ -393,6 +437,12 @@ public class Suika implements ApplicationListener {
         world.dispose();
         debugRenderer.dispose();
         shapeRenderer.dispose();;
+        sunflower.dispose();
+        jasmine.dispose();
+        freesia.dispose();
+        daisy.dispose();
+        dandelion.dispose();
+        hibiscus.dispose();
 
         //STEP 5 OF ADDING NEW FLOWER: DISPOSE FLOWER FOR BETTER PERFORMANCE I.E "newFlower.dispose();"
     }
@@ -407,6 +457,9 @@ public class Suika implements ApplicationListener {
     //IF GAME FAILS
     private boolean isGameOver() {
         for (Body body : flowers) {
+            if (body.getPosition().y > WORLD_HEIGHT / PPM - 45 / PPM) {
+                return true;
+            }
             if (body.getPosition().y > WORLD_HEIGHT / PPM - 45 / PPM) {
                 return true;
             }
