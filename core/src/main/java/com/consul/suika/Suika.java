@@ -30,6 +30,8 @@ import java.util.concurrent.Flow;
 
 
 public class Suika implements ApplicationListener {
+
+    private boolean isGameActive = true; // shu change: tracks whether the game is active
     private static final float PPM = 100f; // Pixels per meter
 
     // World dimensions in meters
@@ -68,6 +70,7 @@ public class Suika implements ApplicationListener {
     Texture daisy;
     Texture dandelion;
     Texture hibiscus;
+    Texture gameOverTexture;
 
     //STEP 1 OF ADDING NEW FLOWER: CALL YOUR VARIABLE I.E "Texture newFlower;"
 
@@ -75,6 +78,7 @@ public class Suika implements ApplicationListener {
     public void create() {
         shapeRenderer = new ShapeRenderer();
         background = new Texture("gameBackground.png");
+        gameOverTexture = new Texture("gameover.png");
         daffidol = new Texture("flower1.png");
         buttercup = new Texture("flower2.png");
         marrigold = new Texture("flower3.png");
@@ -86,6 +90,7 @@ public class Suika implements ApplicationListener {
         daisy = new Texture("flower9.png");
         dandelion = new Texture("flower10.png");
         hibiscus = new Texture("flower11.png");
+
 
         //STEP 2 OF ADDING NEW FLOWER: CREATE A TEXTURE FOR THE FLOWER AS SEEN ABOVE HERE
 
@@ -113,9 +118,9 @@ public class Suika implements ApplicationListener {
         shapeRenderer = new ShapeRenderer();
 
         // CREATE THE FLOORS AND WALLS
-        createPlatform(22.5f / PPM, 80.5f / PPM, 1 / PPM, 45 / PPM);
-        createPlatform(87.5f / PPM, 80.5f / PPM, 1 / PPM, 45 / PPM);
-        createPlatform(56 / PPM, 33.5f / PPM, 36 / PPM, 1 / PPM);
+        createPlatform(.2f / PPM, 80.5f / PPM, 1.5f / PPM, 100 / PPM); //left wall
+        createPlatform(110f / PPM, 80.5f / PPM, 1.5f / PPM, 100 / PPM); //right wall
+        createPlatform(56 / PPM, 35.5f / PPM, 70 / PPM, 1.1f / PPM); //floor
     }
 
     @Override
@@ -127,8 +132,8 @@ public class Suika implements ApplicationListener {
 
     private void renderNextFlower(SpriteBatch batch) {
         // Define the position for the next flower (e.g., top-right corner)
-        float nextFlowerX = WORLD_WIDTH / PPM - 30 / PPM; // 20 pixels from the right edge
-        float nextFlowerY = WORLD_HEIGHT / PPM - 15 / PPM; // 20 pixels from the top edge
+        float nextFlowerX = WORLD_WIDTH / PPM - 13.8f / PPM; // 20 pixels from the right edge
+        float nextFlowerY = WORLD_HEIGHT / PPM - 17.5f / PPM; // 20 pixels from the top edge
 
         // Get the texture for the next flower
         Texture nextFlowerTexture = getTextureForFlowerType(nextFlowerType);
@@ -170,12 +175,11 @@ public class Suika implements ApplicationListener {
 
         batch.begin();
         batch.draw(background, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
-        // Draw the floating flower
-        // Draw the next flower
-        renderNextFlower(batch);
 
         // Draw the floating flower
-        floatingFlowerSprite.draw(batch);
+        if (isGameActive) { // shu change: only draw the floating flower if the game is active
+            floatingFlowerSprite.draw(batch);
+        }
 
         // Draw existing flowers
         for (Body body : flowers) {
@@ -183,39 +187,52 @@ public class Suika implements ApplicationListener {
                 FlowerData flowerData = (FlowerData) body.getUserData();
                 Sprite flowerSprite = flowerData.sprite;
                 flowerSprite.setPosition(
-                    (body.getPosition().x +.5f / PPM) - flowerSprite.getWidth() / 2,
-                    (body.getPosition().y +.5f / PPM) - flowerSprite.getHeight() / 2
+                    (body.getPosition().x + .5f / PPM) - flowerSprite.getWidth() / 2,
+                    (body.getPosition().y + .5f / PPM) - flowerSprite.getHeight() / 2
                 );
                 flowerSprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
                 flowerSprite.draw(batch);
             }
         }
+
+        // Draw the next flower
+        if (isGameActive) { // shu change: only draw the next flower if the game is active
+            renderNextFlower(batch);
+        }
+
+        // Draw the game-over screen if the game is over
+        if (!isGameActive) { // shu change: use isGameActive instead of isGameOver()
+            batch.draw(gameOverTexture, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
+        }
+
         batch.end();
 
-        // this entire shapeRenderer is the guidelines
-        shapeRenderer.setProjectionMatrix(camera.combined);
-        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-        shapeRenderer.setColor(Color.WHITE);
-
-        shapeRenderer.line((floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), floatingFlowerSprite.getY(), (floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), 33.5f / PPM);
-        shapeRenderer.end();
-
-        if (debugMode) {
-            //SHOW THE END GAME LINE
+        // Only render the guideline and debug visuals if the game is active
+        if (isGameActive) { // shu change: use isGameActive instead of !isGameOver()
             shapeRenderer.setProjectionMatrix(camera.combined);
             shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.RED);
-            float gameOverHeight = WORLD_HEIGHT / PPM - 45 / PPM; // Game-over height
-            shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight);
+            shapeRenderer.setColor(Color.WHITE);
+            shapeRenderer.line((floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), floatingFlowerSprite.getY(), (floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), 33.5f / PPM);
             shapeRenderer.end();
-            debugRenderer.render(world, camera.combined);
+
+            if (debugMode) {
+                // Show the end game line
+                shapeRenderer.setProjectionMatrix(camera.combined);
+                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                shapeRenderer.setColor(Color.RED);
+                float gameOverHeight = WORLD_HEIGHT / PPM - 60 / PPM; // Game-over height
+                shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight);
+                shapeRenderer.end();
+                debugRenderer.render(world, camera.combined);
+            }
         }
     }
-
     private void input() {
+        if (!isGameActive) return; // shu change: stop processing input if the game is over
+
         touchPos.set(Gdx.input.getX(), Gdx.input.getY());
         viewport.unproject(touchPos);
-        floatingFlowerSprite.setCenterX(MathUtils.clamp(touchPos.x, 27.5f / PPM, (96 - floatingFlowerSprite.getWidth() * PPM) / PPM));
+        floatingFlowerSprite.setCenterX(MathUtils.clamp(touchPos.x, 1.5f / PPM, (112.5f - floatingFlowerSprite.getWidth() * PPM) / PPM));
 
         //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
         if (Gdx.input.isTouched()) {
@@ -256,17 +273,17 @@ public class Suika implements ApplicationListener {
     public enum FlowerType {
         //STEP 3 OF ADDING NEW FLOWER: THIS WILL SET THE FLOWER LEVEL AND ITS SIZE
         DAFFODIL(1, 4 / PPM),
-        BUTTERCUP(2, 8 / PPM),
-        MARRIGOLD(3, 10 / PPM),
-        CHERRYBLOSSOM(4, 14 / PPM),
-        ORCHID(5, 18 / PPM),
+        BUTTERCUP(2, 6 / PPM),
+        MARRIGOLD(3, 8 / PPM),
+        CHERRYBLOSSOM(4, 10 / PPM),
+        ORCHID(5, 12 / PPM),
         // PLEASE RENAME THESE BELOW!
-        SUNFLOWER(6, 22 / PPM),
-        JASMINE(7, 26 / PPM),
-        FREESIA(8, 30 / PPM),
-        DAISY(9, 34 / PPM),
-        DANDELION(10, 38 / PPM),
-        HIBISCUS(11, 42 / PPM);
+        SUNFLOWER(6, 14 / PPM),
+        JASMINE(7, 16 / PPM),
+        FREESIA(8, 18 / PPM),
+        DAISY(9, 20 / PPM),
+        DANDELION(10, 22 / PPM),
+        HIBISCUS(11, 24 / PPM);
 
         private final int level;
         private final float radius;
@@ -378,7 +395,7 @@ public class Suika implements ApplicationListener {
         Body flowerBody = world.createBody(def);
 
         CircleShape circle = new CircleShape();
-        circle.setRadius(type.getRadius() * 0.7f); // Adjust hitbox size
+        circle.setRadius(type.getRadius() * .84f); // Adjust hitbox size
 
         FixtureDef fixtureDef = new FixtureDef();
         fixtureDef.shape = circle;
@@ -406,7 +423,7 @@ public class Suika implements ApplicationListener {
 
     // STOPS THE PLAYER GOING OUTSIDE
     private void logic() {
-        floatingFlowerSprite.setX(MathUtils.clamp(floatingFlowerSprite.getX(), 23 / PPM, (96 - floatingFlowerSprite.getWidth() * PPM) / PPM));
+        floatingFlowerSprite.setX(MathUtils.clamp(floatingFlowerSprite.getX(), 1.5f / PPM, (112.5f - floatingFlowerSprite.getWidth() * PPM) / PPM));
     }
 
     // CREATES THE WALL AND FLOORS
@@ -443,6 +460,7 @@ public class Suika implements ApplicationListener {
         daisy.dispose();
         dandelion.dispose();
         hibiscus.dispose();
+        gameOverTexture.dispose();
 
         //STEP 5 OF ADDING NEW FLOWER: DISPOSE FLOWER FOR BETTER PERFORMANCE I.E "newFlower.dispose();"
     }
@@ -456,12 +474,14 @@ public class Suika implements ApplicationListener {
 
     //IF GAME FAILS
     private boolean isGameOver() {
+        int flowersAboveLine = 0;
         for (Body body : flowers) {
-            if (body.getPosition().y > WORLD_HEIGHT / PPM - 45 / PPM) {
-                return true;
-            }
-            if (body.getPosition().y > WORLD_HEIGHT / PPM - 45 / PPM) {
-                return true;
+            if (body.getPosition().y > WORLD_HEIGHT / PPM - 60 / PPM) { // Adjust the line height as needed
+                flowersAboveLine++;
+                if (flowersAboveLine >= 4) { // Game over if # flowers cross the line
+                    isGameActive = false; // shu change: disable the game
+                    return true;
+                }
             }
         }
         return false;
@@ -470,7 +490,7 @@ public class Suika implements ApplicationListener {
 
     //LOOK FOR A CERTAIN UPDATE
     public void update(float delta) {
-        world.step(1 / 240f, 6, 2);
+        world.step(1 / 360f, 6, 2);
         if (isGameOver()) {
             Gdx.app.log("Game Over", "A flower reached the top!");
             return;
