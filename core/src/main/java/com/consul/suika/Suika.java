@@ -3,11 +3,16 @@ package com.consul.suika;
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
+import com.badlogic.gdx.Screen;
+import com.badlogic.gdx.audio.Music;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
@@ -20,6 +25,14 @@ import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.physics.box2d.Body;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Image;
+import com.badlogic.gdx.scenes.scene2d.ui.ImageButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.ExtendViewport;
@@ -70,15 +83,77 @@ public class Suika implements ApplicationListener {
     Texture daisy;
     Texture dandelion;
     Texture hibiscus;
-    Texture gameOverTexture;
 
     //STEP 1 OF ADDING NEW FLOWER: CALL YOUR VARIABLE I.E "Texture newFlower;"
+
+
+    //stages for game ui and menu ui
+    private Stage gameStage;
+    private Stage menuStage;
+    private Stage restartStage;
+    private Stage leaderboardStage;
+
+    //texture for pause button
+    private Texture pauseTexture;private TextureRegion pauseTextureRegion;private TextureRegionDrawable pauseTextureRegionDrawable;private ImageButton pauseButton;
+    //texture for continue button
+    private ImageButton continueButton;
+    private ImageButton restartButton;
+    private ImageButton yesButton;
+    private ImageButton noButton;
+
+    //Textures for buttons and kung ano
+    private Texture continueTexture;private TextureRegion continueTextureRegion;private TextureRegionDrawable continueTextureRegionDrawable;
+    private Texture restartTexture;private TextureRegion restartTextureRegion;private TextureRegionDrawable restartTextureRegionDrawable;
+    private Texture noTexture;private TextureRegion noTextureRegion;private TextureRegionDrawable noTextureRegionDrawable;
+    private Texture yesTexture;private TextureRegion yesTextureRegion;private TextureRegionDrawable yesTextureRegionDrawable;
+
+    //for pause
+    private boolean isPaused = false;
+    private boolean isRestarting = false; // Flag to track if restart UI should be shown
+    private boolean inLeaderboard = false;
+
+    //for music and its buttons
+    private ImageButton musicButton;
+    private Music music;
+    private Texture musicButtonTexture,musicButtonPressedTexture;
+    boolean isMusicPlaying = true;
+
+    //for game pause ui
+    private Texture pauseUI;
+
+    //game over stage ui and buttons
+    private Stage gameOverStage;
+    private TextureRegion gameOverTextureRegion;private TextureRegionDrawable gameOverTextureRegionDrawable;
+
+    private ImageButton retryButton;
+    private ImageButton exitButton;
+    private Texture retryTexture;private TextureRegion retryTextureRegion;private TextureRegionDrawable retryTextureRegionDrawable;
+    private Texture gameOverTexture;private Texture exitTexture;private TextureRegion exitTextureRegion;private TextureRegionDrawable exitTextureRegionDrawable;
+
+    //for sound effects (NOT WORKING)
+    private Sound buttonSound,combineSound,collisionSound,dropSound;
+    //Leaderboard menu
+
+    private Texture leaderboardButtonTexture;private TextureRegion leaderboardButtonTextureRegion;private TextureRegionDrawable leaderboardButtonTextureRegionDrawable;private ImageButton leaderboardButton;
+    private Texture leaderboardUI;
+
+    //back button leaderboard
+    private Texture leaderboardBackTexture;private TextureRegion leaderboardBackTextureRegion;private TextureRegionDrawable leaderboardBackTextureRegionDrawable;private ImageButton leaderboardBackButton;
+
+    private SpriteBatch menuBatch;
+    private Stage mainMenuStage;
+    private Texture mainMenuBG;
+    private boolean ifInMain = true;
+
+    private Texture mainMenuPlayTexture;private TextureRegion mainMenuPlayTextureRegion;private TextureRegionDrawable mainMenuPlayTextureRegionDrawable;private ImageButton mainMenuPlayButton;
+    private Texture mainMenuLeaderboardTexture;private TextureRegion mainMenuLeaderboardTextureRegion;private TextureRegionDrawable mainMenuLeaderboardTextureRegionDrawable;private ImageButton mainMenuLeaderboardButton;
+    private Texture mainMenuExitTexture;private TextureRegion mainMenuExitTextureRegion;private TextureRegionDrawable mainMenuExitTextureRegionDrawable;private ImageButton mainMenuExitButton;
+
 
     @Override
     public void create() {
         shapeRenderer = new ShapeRenderer();
         background = new Texture("gameBackground.png");
-        gameOverTexture = new Texture("gameover.png");
         daffidol = new Texture("flower1.png");
         buttercup = new Texture("flower2.png");
         marrigold = new Texture("flower3.png");
@@ -121,6 +196,354 @@ public class Suika implements ApplicationListener {
         createPlatform(.2f / PPM, 80.5f / PPM, 1.5f / PPM, 100 / PPM); //left wall
         createPlatform(110f / PPM, 80.5f / PPM, 1.5f / PPM, 100 / PPM); //right wall
         createPlatform(56 / PPM, 35.5f / PPM, 70 / PPM, 1.1f / PPM); //floor
+
+        // for button positioning
+        float viewportWidth = viewport.getWorldWidth();
+        float viewportHeight = viewport.getWorldHeight();
+
+        //stage for the game ui buttons like pause and retry
+        gameStage = new Stage(viewport);
+        Gdx.input.setInputProcessor(gameStage);
+
+
+        //pause button // size positioning
+        pauseTexture = new Texture("pause.png");
+        pauseTextureRegion = new TextureRegion(pauseTexture);
+        pauseTextureRegionDrawable = new TextureRegionDrawable(pauseTextureRegion);
+        pauseButton = new ImageButton(pauseTextureRegionDrawable);
+        pauseButton.getImage().setScale(0.107f); // This will reduce the size by 90%
+        pauseButton.setSize(0.01f, 0.01f);
+        pauseButton.setPosition(0.041f * viewportWidth, 0.902f * viewportHeight); // Moves the button upwards
+
+        //restart button // size positioning //
+        restartTexture = new Texture(Gdx.files.internal("restart.png"));
+        restartTextureRegion = new TextureRegion(restartTexture);
+        restartTextureRegionDrawable = new TextureRegionDrawable(restartTextureRegion);
+        restartButton = new ImageButton(restartTextureRegionDrawable);
+        restartButton.getImage().setScale(0.107f); // This will reduce the size by 90%
+        restartButton.setPosition(0.041f * viewportWidth, 0.832f * viewportHeight); // Moves the button upwards
+        restartButton.setSize(0.01f, 0.01f);
+
+        //menu stage // new stage for paused menu // settings / music / sound / leaderboard / exit
+        menuStage = new Stage(viewport);
+
+        //pause ui
+        Texture pauseUItexture=new Texture(Gdx.files.internal("GamePause3.png"));
+        TextureRegion pauseUItextureRegion = new TextureRegion(pauseUItexture);
+        Image pauseUI = new Image(pauseUItextureRegion);
+        pauseUI.setScale(1f);
+        pauseUI.setSize(0.8f, 1.3f);
+        pauseUI.setPosition(0.13f * viewportWidth, 0.2f * viewportHeight);
+        menuStage.addActor(pauseUI);
+
+        //continue button for the pause menu
+        continueTexture = new Texture(Gdx.files.internal("continue.png"));
+        continueTextureRegion = new TextureRegion(continueTexture);
+        continueTextureRegionDrawable = new TextureRegionDrawable(continueTextureRegion);
+
+        ImageButton.ImageButtonStyle continueButtonStyle = new ImageButton.ImageButtonStyle();
+        continueButtonStyle.up = continueTextureRegionDrawable;
+        continueButton = new ImageButton(continueButtonStyle);
+
+        continueButton.getImage().setScale(0.6f); // This will reduce the size
+
+        continueButton.setSize(0.6f, 0.17f);
+        continueButton.setPosition(0.23f * viewportWidth, 0.26f * viewportHeight);
+        menuStage.addActor(continueButton);
+
+        //restart stage // menu pops up when restart button is pressed.
+        restartStage = new Stage(viewport);
+        //restart ui
+        Texture restartUItexture = new Texture(Gdx.files.internal("restartUI.png"));
+        TextureRegion restartUItextureRegion = new TextureRegion(restartUItexture);
+        Image restartUI = new Image(restartUItextureRegion);
+        restartUI.setScale(0.5f);
+        restartUI.setSize(2, 1);
+        restartUI.setPosition(0.05f * viewportWidth, 0.5f * viewportHeight); // Moves the button upwards
+
+        restartStage.addActor(restartUI);
+
+
+        yesTexture = new Texture(Gdx.files.internal("yesButton.png"));
+        yesTextureRegion = new TextureRegion(yesTexture);
+        yesTextureRegionDrawable = new TextureRegionDrawable(yesTextureRegion);
+        yesButton = new ImageButton(yesTextureRegionDrawable);
+        yesButton.setPosition(0.71f * viewportWidth, 0.48f * viewportHeight); // Moves the button upwards
+        yesButton.getImage().setScale(0.12f); // This will reduce the size by 90%
+        yesButton.setSize(0.01f, 0.01f);
+        restartStage.addActor(yesButton);
+
+        noTexture = new Texture(Gdx.files.internal("noButton.png"));
+        noTextureRegion = new TextureRegion(noTexture);
+        noTextureRegionDrawable = new TextureRegionDrawable(noTextureRegion);
+        noButton = new ImageButton(noTextureRegionDrawable);
+        noButton.setPosition(0.185f * viewportWidth, 0.48f * viewportHeight); // Moves the button upwards
+        noButton.getImage().setScale(0.12f); // This will reduce the size by 90%
+        noButton.setSize(0.01f, 0.01f);
+
+        restartStage.addActor(noButton);
+
+        // pause button action listener, will switch stage to menuStage // allows the menu ui
+        pauseButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("PauseButton", "Button clicked");
+                if (!isPaused) {
+                    isPaused = true;
+                    Gdx.input.setInputProcessor(menuStage); // Switch input processor to the pause menu stage
+                }
+            }
+        });
+        // for continuing the game // continue button
+        continueButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.app.log("ContinueButton", "Button clicked");
+                if (isPaused) {
+                    isPaused = false;
+                    isTouching = false;
+                    Gdx.input.setInputProcessor(gameStage); // Switch back to the game stage
+
+                }
+            }
+        });
+
+        restartButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("RestartButton", "Button clicked");
+                if (!isPaused) {
+                    isRestarting = true;  // Activate restart UI
+                    Gdx.input.setInputProcessor(restartStage);
+
+                }
+            }
+        });
+
+        yesButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                resetGame();
+                isRestarting = false;
+                isTouching = false;
+                Gdx.input.setInputProcessor(gameStage);
+            }
+        });
+
+        noButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                Gdx.input.setInputProcessor(gameStage);
+                isRestarting = false;
+                isTouching = false;
+            }
+        });
+
+        //music path
+        music = Gdx.audio.newMusic(Gdx.files.internal("game.mp3"));
+        music.setLooping(true);
+        music.setVolume(0.5f);
+        music.play();
+
+        //music button and its style // on and off
+        musicButtonTexture = new Texture(Gdx.files.internal("MusicEnable.png"));
+        musicButtonPressedTexture = new Texture(Gdx.files.internal("MusicDisable.png"));
+        ImageButton.ImageButtonStyle musicButtonStyle = new ImageButton.ImageButtonStyle();
+        musicButtonStyle.up = new TextureRegionDrawable(musicButtonTexture);
+        musicButtonStyle.checked = new TextureRegionDrawable(musicButtonPressedTexture);
+        musicButton = new ImageButton(musicButtonStyle);
+        menuStage.addActor(musicButton);
+        Gdx.app.log("MusicButton", "Button added to screen");
+        musicButton.getImage().setScale(0.01f); // This will reduce the size
+        musicButton.setSize(0.30f, 0.22f);
+        musicButton.setPosition(0.22f * viewportWidth, 0.65f * viewportHeight); // Moves the button upwards
+
+        musicButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                isMusicPlaying = !isMusicPlaying;
+                musicButton.setChecked(!isMusicPlaying); // Toggle music button state
+                if (isMusicPlaying) {
+                    music.play();
+                } else {
+                    music.pause();
+                }
+            }
+        });
+
+        // GAME OVER STAGE UI AND BUTTONS
+        gameOverStage= new Stage(viewport);
+        gameOverTexture = new Texture("gameover3.png");
+        TextureRegion gameOvertextureRegion = new TextureRegion(gameOverTexture);
+        Image gameOverUI = new Image(gameOvertextureRegion);
+        gameOverUI.setScale(0.7f);
+        gameOverUI.setSize(1.2F,1.5f);
+        gameOverUI.setPosition(0.13f * viewportWidth, 0.25f * viewportHeight);
+        gameOverStage.addActor(gameOverUI);
+
+        retryTexture = new Texture(Gdx.files.internal("retryGameOver.png"));
+        retryTextureRegion = new TextureRegion(retryTexture);
+        retryTextureRegionDrawable = new TextureRegionDrawable(retryTextureRegion);
+        retryButton = new ImageButton(retryTextureRegionDrawable);
+        retryButton.getImage().setScale(0.3f); // This will reduce the size
+        retryButton.setSize(0.01f, 0.01f);
+        retryButton.setPosition(0.23f * viewportWidth, 0.26f * viewportHeight);
+        gameOverStage.addActor(retryButton);
+
+        exitTexture = new Texture(Gdx.files.internal("exitGameOver.png"));
+        exitTextureRegion = new TextureRegion(exitTexture);
+        exitTextureRegionDrawable = new TextureRegionDrawable(exitTextureRegion);
+        exitButton = new ImageButton(exitTextureRegionDrawable);
+        exitButton.getImage().setScale(0.3f); // This will reduce the size
+        exitButton.setSize(0.01f, 0.01f);
+        exitButton.setPosition(0.53f * viewportWidth, 0.26f * viewportHeight);
+        gameOverStage.addActor(exitButton);
+
+        exitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("ExitButton", "Button clicked");
+                    ifInMain = true;
+                    resetGame();
+                    Gdx.input.setInputProcessor(mainMenuStage); // Switch input processor to the pause menu stage
+            }
+        });
+
+
+        retryButton.addListener(new ChangeListener() {
+                                  @Override
+                                  public void changed(ChangeEvent event, Actor actor) {
+                                      resetGame();
+                                      isRestarting = false;
+                                      isTouching = false;
+                                      isGameActive = true;
+                                      Gdx.input.setInputProcessor(gameStage);
+
+                                  }
+                              }
+        );
+        //leaderboard stage
+        leaderboardStage = new Stage(viewport);
+
+        //leaderboard button
+        leaderboardButtonTexture = new Texture("leaderboard.png");
+        leaderboardButtonTextureRegion = new TextureRegion(leaderboardButtonTexture);
+        leaderboardButtonTextureRegionDrawable = new TextureRegionDrawable(leaderboardButtonTextureRegion);
+        leaderboardButton = new ImageButton(leaderboardButtonTextureRegionDrawable);
+        leaderboardButton.getImage().setScale(0.107f); // This will reduce the size by 90%
+        leaderboardButton.setSize(0.01f, 0.01f);
+        leaderboardButton.setPosition(0.157f * viewportWidth, 0.902f * viewportHeight); // Moves the button upwards
+        gameStage.addActor(leaderboardButton);
+
+        //for leaderboard UI
+        Texture leaderboardUItexture=new Texture(Gdx.files.internal("leaderboardMenu.png"));
+        TextureRegion leaderboardUItextureRegion = new TextureRegion(leaderboardUItexture);
+        Image leaderboardUI = new Image(leaderboardUItextureRegion);
+        leaderboardUI.setScale(1f);
+        leaderboardUI.setSize(0.8f, 1.3f);
+        leaderboardUI.setPosition(0.13f * viewportWidth, 0.2f * viewportHeight);
+        leaderboardStage.addActor(leaderboardUI);
+
+        leaderboardButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("leaderboardButton", "Button clicked");
+                if (!inLeaderboard) {
+                    inLeaderboard = true;
+                    Gdx.input.setInputProcessor(leaderboardStage); // Switch input processor to the leaderboard stage
+                }
+            }
+        });
+
+        //leadeboard back button
+        leaderboardBackTexture = new Texture("back.png");
+        leaderboardBackTextureRegion = new TextureRegion(leaderboardBackTexture);
+        leaderboardBackTextureRegionDrawable = new TextureRegionDrawable(leaderboardBackTextureRegion);
+        leaderboardBackButton = new ImageButton(leaderboardBackTextureRegionDrawable);
+        leaderboardBackButton.getImage().setScale(0.107f); // This will reduce the size by 90%
+        leaderboardBackButton.setSize(0.01f, 0.01f);
+        leaderboardBackButton.setPosition(0.18f * viewportWidth, 0.76f * viewportHeight); // Moves the button upwards
+        leaderboardStage.addActor(leaderboardBackButton);
+
+        leaderboardBackButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("leaderboardBackButton", "Button clicked");
+                inLeaderboard=false;
+                isTouching = false;
+                Gdx.input.setInputProcessor(gameStage); // Switch input processor to the leaderboard stage
+
+            }
+        });
+
+        // MAIN MENU BG
+        menuBatch= new SpriteBatch();
+        mainMenuBG=new Texture("mainMenuBG.png");
+
+        mainMenuStage=new Stage(viewport);
+
+        gameStage.addActor(restartButton);
+        gameStage.addActor(pauseButton);
+
+        //Main menu buttons
+        mainMenuPlayTexture = new Texture("mainMenuPlay.png");
+        mainMenuPlayTextureRegion = new TextureRegion(mainMenuPlayTexture);
+        mainMenuPlayTextureRegionDrawable = new TextureRegionDrawable(mainMenuPlayTextureRegion);
+
+        ImageButton.ImageButtonStyle playButtonStyle = new ImageButton.ImageButtonStyle();
+        playButtonStyle.up = mainMenuPlayTextureRegionDrawable;
+         mainMenuPlayButton = new ImageButton(playButtonStyle);
+
+        mainMenuPlayButton.getImage().setScale(0.6f); // This will reduce the size
+        mainMenuPlayButton.setSize(0.6f, 0.17f);
+        mainMenuPlayButton.setPosition(0.23f * viewportWidth, 0.55f * viewportHeight);
+        mainMenuStage.addActor(mainMenuPlayButton);
+
+        mainMenuLeaderboardTexture = new Texture("mainMenuLeaderboard.png");
+        mainMenuLeaderboardTextureRegion = new TextureRegion(mainMenuLeaderboardTexture);
+        mainMenuLeaderboardTextureRegionDrawable = new TextureRegionDrawable(mainMenuLeaderboardTextureRegion);
+
+        ImageButton.ImageButtonStyle leaderboardButtonStyle = new ImageButton.ImageButtonStyle();
+        leaderboardButtonStyle.up = mainMenuLeaderboardTextureRegionDrawable;
+        mainMenuLeaderboardButton = new ImageButton(leaderboardButtonStyle);
+
+        mainMenuLeaderboardButton.getImage().setScale(0.6f); // This will reduce the size
+        mainMenuLeaderboardButton.setSize(0.6f, 0.17f);
+        mainMenuLeaderboardButton.setPosition(0.23f * viewportWidth, 0.4f * viewportHeight);
+        mainMenuStage.addActor(mainMenuLeaderboardButton);
+
+        mainMenuExitTexture = new Texture("mainMenuExit.png");
+        mainMenuExitTextureRegion = new TextureRegion(mainMenuExitTexture);
+        mainMenuExitTextureRegionDrawable = new TextureRegionDrawable(mainMenuExitTextureRegion);
+
+        ImageButton.ImageButtonStyle exitButtonStyle = new ImageButton.ImageButtonStyle();
+        exitButtonStyle.up = mainMenuExitTextureRegionDrawable;mainMenuExitButton = new ImageButton(exitButtonStyle);
+
+        mainMenuExitButton.getImage().setScale(0.6f); // This will reduce the size
+        mainMenuExitButton.setSize(0.6f, 0.17f);
+        mainMenuExitButton.setPosition(0.23f * viewportWidth, 0.25f * viewportHeight);
+        mainMenuStage.addActor(mainMenuExitButton);
+
+        Gdx.input.setInputProcessor(mainMenuStage);
+
+        mainMenuPlayButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("mainMenuPlayButton", "Play Button clicked");
+                if (ifInMain) {
+                    ifInMain = false;
+                    isGameActive = true;
+                    Gdx.input.setInputProcessor(gameStage); // Switch input processor to the pause menu stage
+                }
+            }
+        });
+        mainMenuExitButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                Gdx.app.log("mainMenuExitButton", "Exit Button clicked");
+                Gdx.app.exit();
+            }
+        });
     }
 
     @Override
@@ -128,6 +551,7 @@ public class Suika implements ApplicationListener {
         viewport.update(width, height, true);
         camera.update();
         batch.setProjectionMatrix(viewport.getCamera().combined);
+        menuBatch.setProjectionMatrix(viewport.getCamera().combined);
     }
 
     private void renderNextFlower(SpriteBatch batch) {
@@ -166,109 +590,162 @@ public class Suika implements ApplicationListener {
 
     @Override
     public void render() {
-        input();
-        logic();
-        update(Gdx.graphics.getDeltaTime());
 
-        ScreenUtils.clear(Color.BLACK);
-        viewport.apply();
+        if (ifInMain){
 
-        batch.begin();
-        batch.draw(background, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
+            viewport.apply();
+            menuBatch.begin();
+            menuBatch.draw(mainMenuBG, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
+            menuBatch.end();
 
-        // Draw the floating flower
-        if (isGameActive) { // shu change: only draw the floating flower if the game is active
-            floatingFlowerSprite.draw(batch);
-        }
+            mainMenuStage.draw();
 
-        // Draw existing flowers
-        for (Body body : flowers) {
-            if (body.getUserData() instanceof FlowerData) {
-                FlowerData flowerData = (FlowerData) body.getUserData();
-                Sprite flowerSprite = flowerData.sprite;
-                flowerSprite.setPosition(
-                    (body.getPosition().x + .5f / PPM) - flowerSprite.getWidth() / 2,
-                    (body.getPosition().y + .5f / PPM) - flowerSprite.getHeight() / 2
-                );
-                flowerSprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
-                flowerSprite.draw(batch);
+        } else {
+
+
+            input();
+            logic();
+            update(Gdx.graphics.getDeltaTime());
+
+            if (isPaused) {
+                // Render the pause menu stage when the game is paused
+                menuStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); // Update pause menu stage
+                menuStage.draw(); // Draw the pause menu stage
+
+            } else if (isRestarting) {  // Check if we should show the restart UI
+                //render the restart ui
+                restartStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f)); // Update restart stage
+                restartStage.draw(); // Draw the restart UI
+
+
+            } else if (inLeaderboard) {
+
+                leaderboardStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+                leaderboardStage.draw();
+
+            } else {
+                ScreenUtils.clear(Color.BLACK);
+                viewport.apply();
+
+                batch.begin();
+                batch.draw(background, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
+
+                // Draw the floating flower
+                if (isGameActive) { // shu change: only draw the floating flower if the game is active
+                    floatingFlowerSprite.draw(batch);
+                }
+
+                // Draw existing flowers
+                for (Body body : flowers) {
+                    if (body.getUserData() instanceof FlowerData) {
+                        FlowerData flowerData = (FlowerData) body.getUserData();
+                        Sprite flowerSprite = flowerData.sprite;
+                        flowerSprite.setPosition(
+                            (body.getPosition().x + .5f / PPM) - flowerSprite.getWidth() / 2,
+                            (body.getPosition().y + .5f / PPM) - flowerSprite.getHeight() / 2
+                        );
+                        flowerSprite.setRotation(MathUtils.radiansToDegrees * body.getAngle());
+                        flowerSprite.draw(batch);
+                    }
+                }
+
+                // Draw the next flower
+                if (isGameActive) { // shu change: only draw the next flower if the game is active
+                    renderNextFlower(batch);
+                }
+
+
+                batch.end();
+
+                // Only render the guideline and debug visuals if the game is active
+                if (isGameActive) { // shu change: use isGameActive instead of !isGameOver()
+                    shapeRenderer.setProjectionMatrix(camera.combined);
+                    shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                    shapeRenderer.setColor(Color.WHITE);
+                    shapeRenderer.line((floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), floatingFlowerSprite.getY(), (floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), 33.5f / PPM);
+                    shapeRenderer.end();
+
+                    if (debugMode) {
+                        // Show the end game line
+                        shapeRenderer.setProjectionMatrix(camera.combined);
+                        shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
+                        shapeRenderer.setColor(Color.RED);
+                        float gameOverHeight = WORLD_HEIGHT / PPM - 60 / PPM; // Game-over height
+                        shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight);
+                        shapeRenderer.end();
+                        debugRenderer.render(world, camera.combined);
+                    }
+                }
+                // Draw the game-over screen if the game is over
+                if (!isGameActive) { // shu change: use isGameActive instead of isGameOver()
+                    Gdx.input.setInputProcessor(gameOverStage);
+                    gameOverStage.draw();
+                }
+
+
+                gameStage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
+                gameStage.draw();
             }
         }
 
-        // Draw the next flower
-        if (isGameActive) { // shu change: only draw the next flower if the game is active
-            renderNextFlower(batch);
-        }
-
-        // Draw the game-over screen if the game is over
-        if (!isGameActive) { // shu change: use isGameActive instead of isGameOver()
-            batch.draw(gameOverTexture, 0, 0, WORLD_WIDTH / PPM, WORLD_HEIGHT / PPM);
-        }
-
-        batch.end();
-
-        // Only render the guideline and debug visuals if the game is active
-        if (isGameActive) { // shu change: use isGameActive instead of !isGameOver()
-            shapeRenderer.setProjectionMatrix(camera.combined);
-            shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-            shapeRenderer.setColor(Color.WHITE);
-            shapeRenderer.line((floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), floatingFlowerSprite.getY(), (floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2), 33.5f / PPM);
-            shapeRenderer.end();
-
-            if (debugMode) {
-                // Show the end game line
-                shapeRenderer.setProjectionMatrix(camera.combined);
-                shapeRenderer.begin(ShapeRenderer.ShapeType.Line);
-                shapeRenderer.setColor(Color.RED);
-                float gameOverHeight = WORLD_HEIGHT / PPM - 60 / PPM; // Game-over height
-                shapeRenderer.line(0, gameOverHeight, WORLD_WIDTH / PPM, gameOverHeight);
-                shapeRenderer.end();
-                debugRenderer.render(world, camera.combined);
-            }
-        }
     }
     private void input() {
-        if (!isGameActive) return; // shu change: stop processing input if the game is over
+
+        // if the game is paused or any ui pops up, clicking buttons wont accidentally drop flowers
+        if (!isGameActive || isPaused || isRestarting || inLeaderboard || ifInMain) return; // shu change: stop processing input if the game is over
 
         touchPos.set(Gdx.input.getX(), Gdx.input.getY());
         viewport.unproject(touchPos);
         floatingFlowerSprite.setCenterX(MathUtils.clamp(touchPos.x, 1.5f / PPM, (112.5f - floatingFlowerSprite.getWidth() * PPM) / PPM));
 
-        //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
-        if (Gdx.input.isTouched()) {
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            viewport.unproject(touchPos);
 
-            float newX = MathUtils.clamp(
-                touchPos.x - floatingFlowerSprite.getWidth() / 2, // Center the touch position
-                23 / PPM, // Left bound
-                (96 - floatingFlowerSprite.getWidth() * PPM) / PPM // Right bound
-            );
-            floatingFlowerSprite.setX(newX);
+            //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
+            if (Gdx.input.isTouched()) {
+                touchPos.set(Gdx.input.getX(), Gdx.input.getY());
+                viewport.unproject(touchPos);
 
-            isTouching = true;
-        } else if (isTouching) {
-            // If the screen was being touched and is no longer touched, drop the flower
-            float spawnX = floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2;
-            float spawnY = floatingFlowerSprite.getY();
-            createFlower(currentFlowerType, spawnX, spawnY, false); // Create the flower
 
-            currentFlowerType = nextFlowerType;
-            nextFlowerType = getNextFlowerType(currentFlowerType);
+                float newX = MathUtils.clamp(
+                    touchPos.x - floatingFlowerSprite.getWidth() / 2, // Center the touch position
+                    23 / PPM, // Left bound
+                    (96 - floatingFlowerSprite.getWidth() * PPM) / PPM // Right bound
+                );
+                floatingFlowerSprite.setX(newX);
 
-            Texture flowerTexture = getTextureForFlowerType(currentFlowerType);
-            floatingFlowerSprite.setTexture(flowerTexture);
-            floatingFlowerSprite.setSize(currentFlowerType.getRadius() * 2, currentFlowerType.getRadius() * 2);
+                isTouching = true;
+            } else if (isTouching) {
+                // If the screen was being touched and is no longer touched, drop the flower
+                float spawnX = floatingFlowerSprite.getX() + floatingFlowerSprite.getWidth() / 2;
+                float spawnY = floatingFlowerSprite.getY();
+                createFlower(currentFlowerType, spawnX, spawnY, false); // Create the flower
 
-            isTouching = false;
-        }
+                currentFlowerType = nextFlowerType;
+                nextFlowerType = getNextFlowerType(currentFlowerType);
 
+                Texture flowerTexture = getTextureForFlowerType(currentFlowerType);
+                floatingFlowerSprite.setTexture(flowerTexture);
+                floatingFlowerSprite.setSize(currentFlowerType.getRadius() * 2, currentFlowerType.getRadius() * 2);
+
+                isTouching = false;
+            }
         // THIS TOGGLES THE HITBOXES
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F3)) {
             debugMode = !debugMode;
             Gdx.app.log("Debug", "Debug mode: " + (debugMode ? "ON" : "OFF"));
         }
+
+        //ADAM FOR DEBUGGING BUTTON HITBOX DETECTION
+        if (mainMenuPlayButton.isOver()) {
+            Gdx.app.log("mainMenuPlayButton", "Button is being touched");
+        }
+
+
+        if (pauseButton.isOver()) {
+        Gdx.app.log("pauseButton", "Button is being touched");
     }
+}
+
+
 
     public enum FlowerType {
         //STEP 3 OF ADDING NEW FLOWER: THIS WILL SET THE FLOWER LEVEL AND ITS SIZE
@@ -415,12 +892,6 @@ public class Suika implements ApplicationListener {
 
         return flowerBody;
     }
-
-
-
-
-
-
     // STOPS THE PLAYER GOING OUTSIDE
     private void logic() {
         floatingFlowerSprite.setX(MathUtils.clamp(floatingFlowerSprite.getX(), 1.5f / PPM, (112.5f - floatingFlowerSprite.getWidth() * PPM) / PPM));
@@ -461,15 +932,24 @@ public class Suika implements ApplicationListener {
         dandelion.dispose();
         hibiscus.dispose();
         gameOverTexture.dispose();
+        dropSound.dispose();
 
         //STEP 5 OF ADDING NEW FLOWER: DISPOSE FLOWER FOR BETTER PERFORMANCE I.E "newFlower.dispose();"
     }
 
     @Override
-    public void pause() {}
+    public void pause() {
+        if (music.isPlaying()) {
+            music.pause();
+        }
+    }
 
     @Override
-    public void resume() {}
+    public void resume() {
+        if (!music.isPlaying()) {
+            music.play();
+        }
+    }
 
 
     //IF GAME FAILS
@@ -490,6 +970,10 @@ public class Suika implements ApplicationListener {
 
     //LOOK FOR A CERTAIN UPDATE
     public void update(float delta) {
+
+        //pausing// stops movement
+        if (isPaused || isRestarting || !isGameActive) return;
+
         world.step(1 / 360f, 6, 2);
         if (isGameOver()) {
             Gdx.app.log("Game Over", "A flower reached the top!");
@@ -535,5 +1019,16 @@ public class Suika implements ApplicationListener {
 
             contactListener.clearFlowersToMerge();
         }
+    }
+    //Clearing of flowers in the field
+    private void resetGame() {
+
+        for (int i = 0; i < flowers.size; i++) {
+            Body flower = flowers.get(i);
+            if (flower != null) {
+                world.destroyBody(flower); // Destroy the flower's physics body
+            }
+        }
+        flowers.clear();
     }
 }
