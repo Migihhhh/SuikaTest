@@ -31,6 +31,7 @@ import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.Game;
 
@@ -146,8 +147,14 @@ public class GameScreen implements Screen {
 
     private Texture quitTexture;private TextureRegion quitTextureRegion;private TextureRegionDrawable quitTextureRegionDrawable;private ImageButton quitButton;
     private SpriteBatch leaderboardBatch;
-
     Texture leaderboardBG;
+    //Makes drop sound trigger only once when clicked and dragged
+    private boolean firstTouch=false;
+    private boolean isSoundEnabled=true;
+    private Texture soundButtonTexture,soundButtonPressedTexture;
+    private ImageButton soundButton;
+
+
     private ApplicationListener currentListener;// The active game or menu
 
     @Override
@@ -198,6 +205,7 @@ public class GameScreen implements Screen {
         createPlatform(56 / PPM, 35.5f / PPM, 70 / PPM, 1.1f / PPM); //floor
 
         buttonSound = Gdx.audio.newSound(Gdx.files.internal("suikaButtonSound.mp3"));
+        dropSound = Gdx.audio.newSound(Gdx.files.internal("suikaDropSound.mp3"));
 
 
         // for button positioning
@@ -279,7 +287,9 @@ public class GameScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("PauseButton", "Button clicked");
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
 
                 if (!isPaused) {
                     isPaused = true;
@@ -291,7 +301,11 @@ public class GameScreen implements Screen {
         continueButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                buttonSound.play();
+
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
+
                 Gdx.app.log("ContinueButton", "Button clicked");
                 if (isPaused) {
                     isPaused = false;
@@ -305,7 +319,9 @@ public class GameScreen implements Screen {
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
                 Gdx.app.log("RestartButton", "Button clicked");
                 resetGame();
                 isPaused=false;
@@ -317,7 +333,9 @@ public class GameScreen implements Screen {
         quitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
                 Gdx.app.log("quitButton", "Button clicked");
                 isMusicPlaying=false;
                 suikaMusic.pause();
@@ -342,17 +360,47 @@ public class GameScreen implements Screen {
         Gdx.app.log("MusicButton", "Button added to screen");
         musicButton.getImage().setScale(0.01f); // This will reduce the size
         musicButton.setSize(0.28f, 0.20f);
-        musicButton.setPosition(0.22f * viewportWidth, 0.3f * viewportHeight); // Moves the button upwards
+        musicButton.setPosition(0.17f * viewportWidth, 0.3f * viewportHeight); // Moves the button upwards
 
         musicButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
                 isMusicPlaying = !isMusicPlaying;
                 musicButton.setChecked(!isMusicPlaying); // Toggle music button state
                 if (isMusicPlaying) {
                     suikaMusic.play();
                 } else {
                     suikaMusic.pause();
+                }
+            }
+        });
+
+        //music button and its style // on and off
+        soundButtonTexture = new Texture(Gdx.files.internal("soundButtonEnabled.png"));
+        soundButtonPressedTexture = new Texture(Gdx.files.internal("soundButtonDisabled.png"));
+        ImageButton.ImageButtonStyle soundButtonStyle = new ImageButton.ImageButtonStyle();
+        soundButtonStyle.up = new TextureRegionDrawable(soundButtonTexture);
+        soundButtonStyle.checked = new TextureRegionDrawable(soundButtonPressedTexture);
+        soundButton = new ImageButton(soundButtonStyle);
+        menuStage.addActor(soundButton);
+        Gdx.app.log("SoundButton", "Button added to screen");
+        soundButton.getImage().setScale(0.01f); // This will reduce the size
+        soundButton.setSize(0.28f, 0.20f);
+        soundButton.setPosition(0.55f * viewportWidth, 0.3f * viewportHeight); // Moves the button upwards
+
+        soundButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                isSoundEnabled = !isSoundEnabled;
+                soundButton.setChecked(!isSoundEnabled); // Toggle music button state
+                if (!isSoundEnabled){
+                    dropSound.stop();
+                    buttonSound.stop();
+                } else {
+                    isSoundEnabled=true;
                 }
             }
         });
@@ -388,7 +436,9 @@ public class GameScreen implements Screen {
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
                 Gdx.app.log("ExitButton", "Button clicked");
                 isMusicPlaying=false;
                 suikaMusic.pause();
@@ -400,6 +450,9 @@ public class GameScreen implements Screen {
         retryButton.addListener(new ChangeListener() {
                                     @Override
                                     public void changed(ChangeEvent event, Actor actor) {
+                                        if (isSoundEnabled) {
+                                            buttonSound.play();
+                                        }
                                         resetGame();
                                         isRestarting = false;
                                         isTouching = false;
@@ -434,7 +487,10 @@ public class GameScreen implements Screen {
             @Override
             public void clicked(InputEvent event, float x, float y) {
                 Gdx.app.log("leaderboardButton", "Button clicked");
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
+
                 if (!inLeaderboard) {
                     inLeaderboard = true;
                     Gdx.input.setInputProcessor(leaderboardStage); // Switch input processor to the leaderboard stage
@@ -455,7 +511,9 @@ public class GameScreen implements Screen {
         leaderboardBackButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
-                buttonSound.play();
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
                 Gdx.app.log("leaderboardBackButton", "Button clicked");
                 inLeaderboard = false;
                 isTouching = false;
@@ -564,9 +622,16 @@ public class GameScreen implements Screen {
         viewport.unproject(touchPos);
         floatingFlowerSprite.setCenterX(MathUtils.clamp(touchPos.x, 1.5f / PPM, (112.5f - floatingFlowerSprite.getWidth() * PPM) / PPM));
 
-
         //IF YOU TAP / CLICK MOUSE 1 IT DROPS FLOWERS
         if (Gdx.input.isTouched()) {
+            //first touch prevents drop sound from looping
+            if (isSoundEnabled) {
+                if(!firstTouch) {
+                    dropSound.play();
+                    firstTouch = true;
+                }
+            }
+
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
             viewport.unproject(touchPos);
 
@@ -593,6 +658,8 @@ public class GameScreen implements Screen {
             floatingFlowerSprite.setSize(currentFlowerType.getRadius() * 2, currentFlowerType.getRadius() * 2);
 
             isTouching = false;
+        } else {
+            firstTouch = false;
         }
         // THIS TOGGLES THE HITBOXES
         if (Gdx.input.isKeyJustPressed(com.badlogic.gdx.Input.Keys.F3)) {
@@ -600,12 +667,6 @@ public class GameScreen implements Screen {
             Gdx.app.log("Debug", "Debug mode: " + (debugMode ? "ON" : "OFF"));
         }
 
-
-
-
-        if (pauseButton.isOver()) {
-            Gdx.app.log("pauseButton", "Button is being touched");
-        }
     }
 
     public enum FlowerType {
@@ -826,6 +887,7 @@ public class GameScreen implements Screen {
         restartStage.dispose();
         suikaMusic.dispose();
         leaderboardBatch.dispose();
+        dropSound.dispose();
 
         //STEP 5 OF ADDING NEW FLOWER: DISPOSE FLOWER FOR BETTER PERFORMANCE I.E "newFlower.dispose();"
 
@@ -899,16 +961,7 @@ public void update(float delta) {
     }
 }
 //Clearing of flowers in the field
-private void resetGame() {
 
-    for (int i = 0; i < flowers.size; i++) {
-        Body flower = flowers.get(i);
-        if (flower != null) {
-            world.destroyBody(flower); // Destroy the flower's physics body
-        }
-    }
-    flowers.clear();
-}
 private FlowerType getNextFlowerType(FlowerType currentType) {
     FlowerType[] flowerTypes = {
         FlowerType.DAFFODIL,
@@ -940,5 +993,15 @@ private void renderNextFlower(SpriteBatch batch) {
     // Draw the next flower
     nextFlowerSprite.draw(batch);
 }
+    private void resetGame() {
+
+        for (int i = 0; i < flowers.size; i++) {
+            Body flower = flowers.get(i);
+            if (flower != null) {
+                world.destroyBody(flower); // Destroy the flower's physics body
+            }
+        }
+        flowers.clear();
+    }
 
 }
