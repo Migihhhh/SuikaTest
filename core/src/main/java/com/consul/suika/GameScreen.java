@@ -107,8 +107,6 @@ public class GameScreen implements Screen {
     //Textures for buttons and kung ano
     private Texture continueTexture;private TextureRegion continueTextureRegion;private TextureRegionDrawable continueTextureRegionDrawable;
     private Texture restartTexture;private TextureRegion restartTextureRegion;private TextureRegionDrawable restartTextureRegionDrawable;
-    private Texture noTexture;private TextureRegion noTextureRegion;private TextureRegionDrawable noTextureRegionDrawable;
-    private Texture yesTexture;private TextureRegion yesTextureRegion;private TextureRegionDrawable yesTextureRegionDrawable;
 
     //for pause
     private boolean isPaused = false;
@@ -124,14 +122,16 @@ public class GameScreen implements Screen {
     //for game pause ui
     private Texture pauseUI;
 
+
     //game over stage ui and buttons
     private Stage gameOverStage;
-    private TextureRegion gameOverTextureRegion;private TextureRegionDrawable gameOverTextureRegionDrawable;
+
+    private Texture gameOverUI;
 
     private ImageButton retryButton;
     private ImageButton exitButton;
     private Texture retryTexture;private TextureRegion retryTextureRegion;private TextureRegionDrawable retryTextureRegionDrawable;
-    private Texture gameOverTexture;private Texture exitTexture;private TextureRegion exitTextureRegion;private TextureRegionDrawable exitTextureRegionDrawable;
+    private Texture exitTexture;private TextureRegion exitTextureRegion;private TextureRegionDrawable exitTextureRegionDrawable;
 
     //for sound effects (NOT WORKING)
     private Sound buttonSound,combineSound,collisionSound,dropSound;
@@ -234,6 +234,7 @@ public class GameScreen implements Screen {
         Texture pauseUItexture = new Texture(Gdx.files.internal("pauseMenu.png"));
         TextureRegion pauseUItextureRegion = new TextureRegion(pauseUItexture);
         Image pauseUI = new Image(pauseUItextureRegion);
+
         pauseUI.setScale(1f);
         pauseUI.setSize(1.1f, 1.92f);
         pauseUI.setPosition(0f * viewportWidth, 0f * viewportHeight);
@@ -316,6 +317,9 @@ public class GameScreen implements Screen {
             }
         });
 
+
+
+
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -350,33 +354,19 @@ public class GameScreen implements Screen {
         suikaMusic.play();
 
         //music button and its style // on and off
-        musicButtonTexture = new Texture(Gdx.files.internal("MusicEnabled.png"));
-        musicButtonPressedTexture = new Texture(Gdx.files.internal("MusicDisabled.png"));
+        musicButtonTexture = new Texture(Gdx.files.internal("musicEnabled.png"));
+        musicButtonPressedTexture = new Texture(Gdx.files.internal("musicDisabled.png"));
         ImageButton.ImageButtonStyle musicButtonStyle = new ImageButton.ImageButtonStyle();
         musicButtonStyle.up = new TextureRegionDrawable(musicButtonTexture);
         musicButtonStyle.checked = new TextureRegionDrawable(musicButtonPressedTexture);
         musicButton = new ImageButton(musicButtonStyle);
         menuStage.addActor(musicButton);
-        Gdx.app.log("MusicButton", "Button added to screen");
-        musicButton.getImage().setScale(0.01f); // This will reduce the size
+
+        musicButton.getImage().setScale(0.03f); // This will reduce the size
         musicButton.setSize(0.28f, 0.20f);
         musicButton.setPosition(0.17f * viewportWidth, 0.3f * viewportHeight); // Moves the button upwards
 
-        musicButton.addListener(new ClickListener() {
-            @Override
-            public void clicked(InputEvent event, float x, float y) {
-                if (isSoundEnabled) {
-                    buttonSound.play();
-                }
-                isMusicPlaying = !isMusicPlaying;
-                musicButton.setChecked(!isMusicPlaying); // Toggle music button state
-                if (isMusicPlaying) {
-                    suikaMusic.play();
-                } else {
-                    suikaMusic.pause();
-                }
-            }
-        });
+
 
         //music button and its style // on and off
         soundButtonTexture = new Texture(Gdx.files.internal("soundButtonEnabled.png"));
@@ -404,29 +394,49 @@ public class GameScreen implements Screen {
                 }
             }
         });
+        musicButton.addListener(new ClickListener() {
+            @Override
+            public void clicked(InputEvent event, float x, float y) {
+                if (isSoundEnabled) {
+                    buttonSound.play();
+                }
+                isMusicPlaying = !isMusicPlaying;
+                musicButton.setChecked(!isMusicPlaying); // Toggle music button state
+                if (isMusicPlaying) {
+                    suikaMusic.play();
+                } else {
+                    suikaMusic.pause();
+                }
+            }
+        });
 
         // GAME OVER STAGE UI AND BUTTONS
         gameOverStage = new Stage(viewport);
-        gameOverTexture = new Texture("gameover3.png");
-        TextureRegion gameOvertextureRegion = new TextureRegion(gameOverTexture);
-        Image gameOverUI = new Image(gameOvertextureRegion);
-        gameOverUI.setScale(0.7f);
-        gameOverUI.setSize(1.2F, 1.5f);
-        gameOverUI.setPosition(0.13f * viewportWidth, 0.25f * viewportHeight);
-        gameOverStage.addActor(gameOverUI);
+        
+        Texture gameoverUItexture = new Texture(Gdx.files.internal("gameOverUI.png"));
+        TextureRegion gameoverUItextureRegion = new TextureRegion(gameoverUItexture);
+        Image gameoverUI = new Image(gameoverUItextureRegion);
+
+        gameoverUI.setScale(0.7f);
+        gameoverUI.setSize(1.2f, 1.5f);
+        gameoverUI.setPosition(0.13f * viewportWidth, 0.25f * viewportHeight);
+        gameOverStage.addActor(gameoverUI);
 
         retryTexture = new Texture(Gdx.files.internal("retryGameOver.png"));
         retryTextureRegion = new TextureRegion(retryTexture);
         retryTextureRegionDrawable = new TextureRegionDrawable(retryTextureRegion);
+
         retryButton = new ImageButton(retryTextureRegionDrawable);
         retryButton.getImage().setScale(0.3f); // This will reduce the size
         retryButton.setSize(0.01f, 0.01f);
         retryButton.setPosition(0.23f * viewportWidth, 0.26f * viewportHeight);
+
         gameOverStage.addActor(retryButton);
 
         exitTexture = new Texture(Gdx.files.internal("exitGameOver.png"));
         exitTextureRegion = new TextureRegion(exitTexture);
         exitTextureRegionDrawable = new TextureRegionDrawable(exitTextureRegion);
+
         exitButton = new ImageButton(exitTextureRegionDrawable);
         exitButton.getImage().setScale(0.3f); // This will reduce the size
         exitButton.setSize(0.01f, 0.01f);
@@ -882,12 +892,16 @@ public class GameScreen implements Screen {
         daisy.dispose();
         dandelion.dispose();
         hibiscus.dispose();
-        gameOverTexture.dispose();
         gameStage.dispose();
         restartStage.dispose();
         suikaMusic.dispose();
         leaderboardBatch.dispose();
         dropSound.dispose();
+        gameOverStage.dispose();
+        buttonSound.dispose();
+        continueTexture.dispose();
+        exitTexture.dispose();
+        pauseTexture.dispose();
 
         //STEP 5 OF ADDING NEW FLOWER: DISPOSE FLOWER FOR BETTER PERFORMANCE I.E "newFlower.dispose();"
 
