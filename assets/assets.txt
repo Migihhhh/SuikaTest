@@ -6,9 +6,7 @@ SuikaMusic.mp3
 background.png
 basket.png
 bestscore.png
-combineSound.mp3
 creditsButton.png
-dropSound.mp3
 exitButton.png
 exitGameOver.png
 flower1.png
@@ -22,7 +20,6 @@ flower6.png
 flower7.png
 flower8.png
 flower9.png
-game.mp3
 game1button.png
 game2Button.png
 game3Button.png
@@ -52,4 +49,7 @@ resume.png
 retryButton.png
 retryGameOver.png
 score.png
+soundButtonDisabled.png
+soundButtonEnabled.png
 suikaButtonSound.mp3
+suikaDropSound.mp3
