@@ -1,5 +1,6 @@
 package com.consul.suika;
 
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -18,13 +19,13 @@ public class FlowerContactListener implements ContactListener {
         Fixture fixtureA = contact.getFixtureA();
         Fixture fixtureB = contact.getFixtureB();
 
-        if (fixtureA.getBody().getUserData() instanceof Suika.FlowerData &&
-            fixtureB.getBody().getUserData() instanceof Suika.FlowerData) {
-            Suika.FlowerData dataA = (Suika.FlowerData) fixtureA.getBody().getUserData();
-            Suika.FlowerData dataB = (Suika.FlowerData) fixtureB.getBody().getUserData();
+        if (fixtureA.getBody().getUserData() instanceof GameScreen.FlowerData &&
+            fixtureB.getBody().getUserData() instanceof GameScreen.FlowerData) {
+            GameScreen.FlowerData dataA = (GameScreen.FlowerData) fixtureA.getBody().getUserData();
+            GameScreen.FlowerData dataB = (GameScreen.FlowerData) fixtureB.getBody().getUserData();
 
-            Suika.FlowerType typeA = dataA.type;
-            Suika.FlowerType typeB = dataB.type;
+            GameScreen.FlowerType typeA = dataA.type;
+            GameScreen.FlowerType typeB = dataB.type;
 
             Gdx.app.log("Collision", "Flower A: " + typeA + ", Flower B: " + typeB);
 
